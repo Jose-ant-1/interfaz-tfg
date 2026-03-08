@@ -1,0 +1,8 @@
+<div class="login-card">
+  <h2>Acceso Proyecto 3D</h2>
+  <form (submit)="onSubmit(); $event.preventDefault()">
+    <input type="email" name="email" [(ngModel)]="email" placeholder="Email" required>
+    <input type="password" name="password" [(ngModel)]="password" placeholder="Contraseña" required>
+    <button type="submit">Entrar</button>
+  </form>
+</div>
