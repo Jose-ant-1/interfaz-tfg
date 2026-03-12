@@ -1,0 +1,12 @@
+<nav class="navbar">
+  <div class="logo">Proyecto 3D</div>
+
+  <div class="menu">
+
+    @if (authService.currentUser()) {
+      <span>Hola, {{ authService.currentUser()?.nombre }}</span>
+      <a routerLink="/productos">Productos</a>
+      <button (click)="onLogout()">Cerrar Sesión</button>
+    }
+  </div>
+</nav>

@@ -1,15 +1,23 @@
-import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs';
-import { LoginResponse } from '../models/auth.model';
+import {Injectable, inject, signal} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {tap} from 'rxjs';
+import {LoginResponse} from '../models/auth.model';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class AuthService {
   private http = inject(HttpClient);
   private readonly AUTH_URL = 'http://localhost:8080/api/auth';
 
-  // Signal para saber en tiempo real si el usuario está logueado
   currentUser = signal<LoginResponse | null>(null);
+
+  constructor() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Para simplificar ahora, creamos un objeto mínimo
+      // indicando que el usuario está logueado
+      this.currentUser.set({ token } as any);
+    }
+  }
 
   login(credentials: { email: string; password: string }) {
     return this.http.post<LoginResponse>(`${this.AUTH_URL}/login`, credentials).pipe(
