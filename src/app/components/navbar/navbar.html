@@ -1,12 +1,44 @@
-<nav class="navbar">
-  <div class="logo">Proyecto 3D</div>
+<nav class="bg-slate-900 text-white shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16 items-center">
 
-  <div class="menu">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center font-bold">3D</div>
+        <span class="text-xl font-bold tracking-tight">Tienda<span class="text-blue-400">3D</span></span>
+      </div>
 
-    @if (authService.currentUser()) {
-      <span>Hola, {{ authService.currentUser()?.nombre }}</span>
-      <a routerLink="/productos">Productos</a>
-      <button (click)="onLogout()">Cerrar Sesión</button>
-    }
+      <div class="flex items-center gap-6">
+        @if (authService.currentUser()) {
+          <div class="flex items-center gap-4 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
+            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span class="text-sm font-medium text-slate-300">
+              Hola, <span class="text-white">{{ authService.currentUser()?.nombre }}</span>
+            </span>
+          </div>
+
+          <a routerLink="/productos"
+             class="text-slate-300 hover:text-white transition-colors font-medium">
+            Productos
+          </a>
+
+          <a routerLink="/pedidos" class="text-slate-300 hover:text-white transition-colors font-medium">
+            Gestión Pedidos
+          </a>
+
+          <a routerLink="/admin/usuarios" class="text-slate-300 hover:text-white transition-colors font-medium">
+            Gestión Usuarios
+          </a>
+
+          <button (click)="onLogout()"
+                  class="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all border border-red-500/20">
+            Logout </button>
+        } @else {
+          <a routerLink="/login"
+             class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold transition-all shadow-md shadow-blue-900/20">
+            Iniciar Sesión
+          </a>
+        }
+      </div>
+    </div>
   </div>
 </nav>

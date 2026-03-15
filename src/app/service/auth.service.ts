@@ -12,19 +12,22 @@ export class AuthService {
 
   constructor() {
     const token = localStorage.getItem('token');
+    const nombre = localStorage.getItem('user_name'); // Recuperamos el nombre guardado
+
     if (token) {
-      // Para simplificar ahora, creamos un objeto mínimo
-      // indicando que el usuario está logueado
-      this.currentUser.set({ token } as any);
+      // Reconstruimos el objeto con el nombre para que el Navbar lo vea
+      this.currentUser.set({
+        token,
+        nombre: nombre || 'Usuario'
+      } as LoginResponse);
     }
   }
 
   login(credentials: { email: string; password: string }) {
     return this.http.post<LoginResponse>(`${this.AUTH_URL}/login`, credentials).pipe(
       tap(res => {
-        // Guardamos el token en el navegador
         localStorage.setItem('token', res.token);
-        // Actualizamos el signal con los datos del usuario
+        localStorage.setItem('user_name', res.nombre); // Guardamos el nombre específicamente
         this.currentUser.set(res);
       })
     );
@@ -32,6 +35,7 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('user_name'); // Limpiamos al salir
     this.currentUser.set(null);
   }
 }

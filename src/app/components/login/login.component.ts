@@ -1,33 +1,29 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../service/auth.service';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import {FormsModule} from '@angular/forms';
+import {AuthService} from '../../service/auth.service'; // Importar el Router
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [FormsModule],
-  templateUrl: 'login.component.html'
+  templateUrl: './login.component.html',
+  imports: [
+    FormsModule
+  ],
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  private authService = inject(AuthService);
-  private router = inject(Router);
-
   email = '';
   password = '';
 
+// Inyecta el AuthService en el constructor
+  constructor(private router: Router, private authService: AuthService) {}
+
   onSubmit() {
     this.authService.login({ email: this.email, password: this.password }).subscribe({
-      next: (res) => {
-        console.log('¡Login con éxito! Token recibido:', res.token);
-        // Aquí podrías redirigir a /catalogo más adelante
-        alert('¡Login con éxito!');
-        console.log('Datos recibidos:', res);
+      next: () => {
+        this.router.navigate(['/productos']); // Solo redirige si el login fue exitoso
       },
-      error: (err) => {
-        console.error('Error en el login:', err);
-        alert('Credenciales incorrectas o servidor caído');
-      }
+      error: (err) => console.error('Error en login', err)
     });
   }
 }

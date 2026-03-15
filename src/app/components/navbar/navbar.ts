@@ -5,17 +5,16 @@ import { AuthService } from '../../service/auth.service';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink], // Para poder usar [routerLink] en el HTML
+  imports: [RouterLink], // Asegúrate de que CommonModule esté disponible si usas versiones antiguas, pero en Angular 21 con el flujo de control nuevo (@if) esto debería bastar.
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
 export class NavbarComponent {
-  // Inyectamos servicios
-  public authService = inject(AuthService);
+  public authService = inject(AuthService); // Inyectas el servicio que contiene la señal
   private router = inject(Router);
 
   onLogout() {
-    this.authService.logout(); // Esto borra el token y limpia el signal
-    this.router.navigate(['/login']); // Redirigimos al login
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 }
