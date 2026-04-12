@@ -12,14 +12,15 @@ export class AuthService {
 
   constructor() {
     const token = localStorage.getItem('token');
-    const nombre = localStorage.getItem('user_name'); // Recuperamos el nombre guardado
+    const userData = localStorage.getItem('user_data'); // Usamos una clave para todo el objeto
 
-    if (token) {
-      // Reconstruimos el objeto con el nombre para que el Navbar lo vea
-      this.currentUser.set({
-        token,
-        nombre: nombre || 'Usuario'
-      } as LoginResponse);
+    if (token && userData) {
+      try {
+        // Recuperamos el objeto completo que incluye los ROLES
+        this.currentUser.set(JSON.parse(userData));
+      } catch (e) {
+        this.logout();
+      }
     }
   }
 
@@ -27,7 +28,8 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.AUTH_URL}/login`, credentials).pipe(
       tap(res => {
         localStorage.setItem('token', res.token);
-        localStorage.setItem('user_name', res.nombre); // Guardamos el nombre específicamente
+        // GUARDAMOS EL OBJETO COMPLETO COMO STRING
+        localStorage.setItem('user_data', JSON.stringify(res));
         this.currentUser.set(res);
       })
     );
@@ -35,7 +37,14 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('token');
-    localStorage.removeItem('user_name'); // Limpiamos al salir
+    localStorage.removeItem('user_data'); // Limpiamos la nueva clave
     this.currentUser.set(null);
   }
+
+  registro(datos: any) {
+    return this.http.post(`${this.AUTH_URL}/register`, datos, {
+      responseType: 'text' // Ponemos esto porque el servidor devuelve un String, no un JSON
+    });
+  }
+
 }

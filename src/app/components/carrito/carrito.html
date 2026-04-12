@@ -1,0 +1,68 @@
+<div class="min-h-screen bg-slate-50 p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-black text-slate-900 mb-8 uppercase tracking-tighter">Tu Carrito</h1>
+
+    @if (items().length > 0) {
+      <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 overflow-hidden">
+        <div class="p-8">
+          <ul class="divide-y divide-slate-100">
+            @for (item of items(); track item.id) {
+              <li class="py-6 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden border border-slate-50 shadow-sm shrink-0">
+                    @if (item.imagenUrl) {
+                      <img [src]="item.imagenUrl"
+                           [alt]="item.nombre"
+                           class="w-full h-full object-contain p-1">
+                    } @else {
+                      <span class="font-bold text-slate-400 text-xs uppercase">3D</span>
+                    }
+                  </div>
+
+                  <div>
+                    <h3 class="font-bold text-slate-800">{{ item.nombre }}</h3>
+                    <p class="text-sm text-slate-500">{{ item.precio | currency:'EUR' }} / unidad</p>
+                  </div>
+                </div>
+
+                <div class="flex items-center bg-slate-100 rounded-lg p-1 gap-1">
+                  <button (click)="reducir(item.id)"
+                          class="bg-white p-1.5 rounded shadow-sm hover:text-red-500 transition-colors active:scale-90">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                    </svg>
+                  </button>
+
+                  <span class="px-2 font-bold text-slate-700 min-w-[3rem] text-center">{{ item.cantidad }} uds</span>
+
+                  <button (click)="aumentar(item)"
+                          class="bg-white p-1.5 rounded shadow-sm hover:text-blue-600 transition-colors active:scale-90">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+
+          <div class="mt-8 pt-8 border-t-2 border-slate-50 flex justify-between items-end">
+            <div>
+              <p class="text-slate-400 font-bold uppercase text-xs tracking-widest">Total a pagar</p>
+              <p class="text-4xl font-black text-blue-600">{{ carritoService.precioTotal() | currency:'EUR' }}</p>
+            </div>
+
+            <button class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-lg shadow-blue-200">
+              Tramitar Pedido
+            </button>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="text-center py-20 bg-white rounded-[2rem] border border-dashed border-slate-300">
+        <p class="text-slate-400 text-lg font-medium">Tu carrito está tan vacío como una placa de impresión sin nivelar.</p>
+        <button routerLink="/productos" class="mt-6 text-blue-600 font-bold hover:underline">Ir a buscar piezas 3D</button>
+      </div>
+    }
+  </div>
+</div>

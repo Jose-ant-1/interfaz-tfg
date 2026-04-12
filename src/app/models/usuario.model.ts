@@ -3,7 +3,7 @@ export interface Usuario {
   email: string;
   nombre: string;
   apellidos: string;
-  contrasenia?: string; // <--- AÑADE ESTO (Opcional con ?)
+  contrasenia?: string;
   telefono: string;
   direccion: string;
   ciudad: string;

@@ -1,5 +1,5 @@
 export interface LoginResponse {
-  token: string;    // El JWT que genera tu Spring Boot
+  token: string;    // El JWT que genera Spring Boot
   type: string;     // Normalmente "Bearer"
   id: number;       // ID del usuario en la base de datos
   email: string;    // Email del usuario

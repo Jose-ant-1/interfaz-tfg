@@ -30,7 +30,7 @@ export class EditUsuarioComponent implements OnInit {
     } else {
       // MODO CREACIÓN: Inicializamos con valores por defecto
       this.usuario.set({
-        id: 0, // Importante: ID 0 para que Jackson no llore (como en productos)
+        id: 0, // Importante: ID 0 para que Jackson no de error
         email: '',
         nombre: '',
         apellidos: '',
@@ -49,10 +49,10 @@ export class EditUsuarioComponent implements OnInit {
     const u = this.usuario();
     if (!u) return;
 
-    // BLINDAJE DE TIPOS (Igual que con los productos)
+
     u.codigoPostal = Number(u.codigoPostal) || 0;
 
-    // Si es nuevo, usamos el método crear
+    // Si es nuevo, usamos el metodo crear
     const peticion = (u.id === 0)
       ? this.usuarioService.crear(u)
       : this.usuarioService.actualizar(u.id, u);

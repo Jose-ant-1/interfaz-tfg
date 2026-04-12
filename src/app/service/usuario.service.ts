@@ -21,7 +21,6 @@ export class UsuarioService {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
-  // usuario.service.ts
   obtenerPorId(id: number) {
     return this.http.get<Usuario>(`${this.apiUrl}/${id}`);
   }

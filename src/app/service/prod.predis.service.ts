@@ -17,12 +17,10 @@ export class ProdPredService {
     });
   }
 
-  // --- AÑADE ESTO ---
   obtenerPorId(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
 
-  // Añade esto a tu ProdPredService
   actualizar(id: number, producto: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, producto);
   }

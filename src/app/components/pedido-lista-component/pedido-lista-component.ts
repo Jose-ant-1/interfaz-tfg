@@ -17,7 +17,7 @@ export class PedidosListaComponent implements OnInit {
 
   cambiarEstado(id: number, estado: string) {
     this.pedidoService.actualizarEstado(id, estado).subscribe(() => {
-      this.pedidoService.obtenerTodos(); // Recargamos la lista
+      this.pedidoService.obtenerTodos();
     });
   }
 }

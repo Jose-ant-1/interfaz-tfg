@@ -1,17 +1,17 @@
 export interface Producto {
-  id?: number; // Opcional porque al crear no existe
+  id?: number;
   nombreProducto: string;
   descripcion: string;
-  precio: number; // Java double
-  stockDisponible: number; // Java int
+  precio: number;
+  stockDisponible: number;
   dimensiones?: string;
-  pesoGramos: number; // Java double - Quita el '?' para obligarte a ponerlo
-  tiempoImpresionMinutos: number; // Java int - ¡Faltaba aquí!
-  idCategoria: number; // Java int - ¡Faltaba aquí!
+  pesoGramos: number;
+  tiempoImpresionMinutos: number;
+  idCategoria: number;
   caracteristicas?: string;
-  destacado: boolean; // ¡Faltaba aquí!
+  destacado: boolean;
   disponible: boolean;
-  // Para las relaciones, de momento puedes ponerlos como opcionales
+
   material?: any;
   tecnologia?: any;
 }

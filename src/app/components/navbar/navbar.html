@@ -1,44 +1,43 @@
 <nav class="bg-slate-900 text-white shadow-lg">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between h-16 items-center">
+  <div class="max-w-7xl mx-auto px-4 flex justify-between h-16 items-center">
 
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center font-bold">3D</div>
-        <span class="text-xl font-bold tracking-tight">Tienda<span class="text-blue-400">3D</span></span>
-      </div>
+    <div class="flex items-center gap-2 cursor-pointer" routerLink="/productos">
+      <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center font-bold">3D</div>
+      <span class="text-xl font-bold tracking-tight">Tienda<span class="text-blue-400">3D</span></span>
+    </div>
 
-      <div class="flex items-center gap-6">
-        @if (authService.currentUser()) {
-          <div class="flex items-center gap-4 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
-            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span class="text-sm font-medium text-slate-300">
-              Hola, <span class="text-white">{{ authService.currentUser()?.nombre }}</span>
-            </span>
-          </div>
+    <div class="flex items-center gap-4">
+      <a routerLink="/productos" class="text-slate-300 hover:text-white font-medium">Productos</a>
 
-          <a routerLink="/productos"
-             class="text-slate-300 hover:text-white transition-colors font-medium">
-            Productos
-          </a>
+      @if (!esAdmin()) {
+        <div routerLink="/carrito" class="relative cursor-pointer px-2">
+          <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          @if (carritoService.totalProductos() > 0) {
+            <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded-full">{{ carritoService.totalProductos() }}</span>
+          }
+        </div>
+      }
 
-          <a routerLink="/pedidos" class="text-slate-300 hover:text-white transition-colors font-medium">
-            Gestión Pedidos
-          </a>
+      @if (authService.currentUser()) {
 
-          <a routerLink="/admin/usuarios" class="text-slate-300 hover:text-white transition-colors font-medium">
-            Gestión Usuarios
-          </a>
-
-          <button (click)="onLogout()"
-                  class="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all border border-red-500/20">
-            Logout </button>
-        } @else {
-          <a routerLink="/login"
-             class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold transition-all shadow-md shadow-blue-900/20">
-            Iniciar Sesión
-          </a>
+        @if (!esAdmin()) {
+          <a routerLink="/mis-pedidos" class="text-slate-300 hover:text-white font-medium">Mis Pedidos</a>
         }
-      </div>
+
+        @if (esAdmin()) {
+          <a routerLink="/pedidos" class="text-slate-300 hover:text-white font-medium">Gestionar Pedidos</a>
+          <a routerLink="/admin/usuarios" class="text-orange-400 hover:text-orange-300 font-bold uppercase text-xs">Usuarios</a>
+        }
+
+        <span class="text-slate-400 text-sm border-r border-slate-700 pr-4 mr-2">
+          Hola, <span class="text-white font-bold">{{ authService.currentUser()?.nombre }}</span>
+        </span>
+        <button (click)="onLogout()" class="text-red-500 font-bold text-sm">Cerrar Sesión</button>
+      } @else {
+        <a routerLink="/login" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm">Iniciar sesión</a>
+      }
     </div>
   </div>
 </nav>

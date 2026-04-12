@@ -1,0 +1,46 @@
+<div class="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+  <div class="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 p-10">
+
+    <div class="text-center mb-8">
+      <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center font-bold text-white mx-auto mb-4 shadow-lg shadow-blue-200">
+        3D
+      </div>
+      <h1 class="text-3xl font-black text-slate-900 uppercase italic tracking-tighter">Nueva Cuenta</h1>
+      <p class="text-slate-500 font-medium">Completa tus datos para empezar</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #registroForm="ngForm" class="space-y-5">
+
+      <div>
+        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Nombre Completo</label>
+        <input type="text" [(ngModel)]="registroData.nombre" name="nombre" required
+               class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-semibold text-slate-700"
+               placeholder="Tu nombre">
+      </div>
+
+      <div>
+        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Correo Electrónico</label>
+        <input type="email" [(ngModel)]="registroData.email" name="email" required
+               class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-semibold text-slate-700"
+               placeholder="ejemplo@correo.com">
+      </div>
+
+      <div>
+        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Contraseña</label>
+        <input type="password" [(ngModel)]="registroData.password" name="password" required
+               class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-semibold text-slate-700"
+               placeholder="Mínimo 6 caracteres">
+      </div>
+
+      <button type="submit" [disabled]="!registroForm.form.valid"
+              class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-tighter shadow-xl hover:bg-blue-600 disabled:bg-slate-300 disabled:shadow-none transition-all active:scale-95 mt-4">
+        Crear mi cuenta
+      </button>
+
+      <p class="text-center text-slate-500 text-sm font-medium pt-4">
+        ¿Ya eres miembro?
+        <a routerLink="/login" class="text-blue-600 font-bold hover:underline italic">Inicia sesión</a>
+      </p>
+    </form>
+  </div>
+</div>

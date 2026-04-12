@@ -8,10 +8,17 @@
       </a>
 
       <div class="bg-white rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
-        <div class="bg-slate-100 flex items-center justify-center p-12">
-          <svg class="w-32 h-32 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-width="1" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"></path>
-          </svg>
+
+        <div class="bg-slate-100 flex items-center justify-center p-8 min-h-[400px]">
+          @if (producto().imagenUrl) {
+            <img [src]="producto().imagenUrl"
+                 [alt]="producto().nombreProducto"
+                 class="w-full h-full object-contain drop-shadow-2xl transition-transform hover:scale-105 duration-500">
+          } @else {
+            <svg class="w-32 h-32 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-width="1" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"></path>
+            </svg>
+          }
         </div>
 
         <div class="p-8 md:p-12 flex flex-col">
@@ -46,7 +53,7 @@
               <p class="text-sm text-slate-400 font-medium">Precio final</p>
               <p class="text-4xl font-black text-slate-900">{{ producto().precio | currency:'EUR' }}</p>
             </div>
-            <button class="bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-900 transition-all shadow-lg shadow-blue-200 active:scale-95">
+            <button (click)="agregarAlCarrito(producto())" class="bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-slate-900 transition-all shadow-lg shadow-blue-200 active:scale-95">
               Añadir al carrito
             </button>
           </div>

@@ -18,7 +18,6 @@ export class PedidoService {
   }
 
   actualizarEstado(id: number, nuevoEstado: string) {
-    // Tu API espera un Map o objeto con el campo 'estado'
     return this.http.patch(`${this.apiUrl}/${id}/estado`, { estado: nuevoEstado });
   }
 
