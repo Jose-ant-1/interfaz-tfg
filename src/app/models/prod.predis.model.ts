@@ -6,6 +6,7 @@ export interface Producto {
   stockDisponible: number;
   dimensiones?: string;
   pesoGramos: number;
+  imagenUrl: string;
   tiempoImpresionMinutos: number;
   idCategoria: number;
   caracteristicas?: string;

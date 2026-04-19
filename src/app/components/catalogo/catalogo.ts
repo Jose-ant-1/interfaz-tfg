@@ -33,7 +33,7 @@ export class Catalogo implements OnInit {
     this.carritoService.agregarProducto(producto);
   }
 
-  borrarProducto(id: number) {
+  borrarProducto(id: number | undefined) {
     if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
       this.productoService.eliminar(id).subscribe({
         next: () => this.productoService.obtenerTodos(),

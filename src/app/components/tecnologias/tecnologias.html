@@ -1,0 +1,126 @@
+<div class="min-h-screen bg-slate-50 p-6 md:p-12">
+  <div class="max-w-6xl mx-auto">
+
+    <header class="mb-10">
+      <h1 class="text-4xl font-black text-slate-900 tracking-tight uppercase italic">
+        @if (authService.currentUser()?.roles?.includes('ADMIN')) {
+          Gestión de <span class="text-blue-600">Tecnologías</span>
+        } @else {
+          Nuestras <span class="text-blue-600">Tecnologías</span>
+        }
+      </h1>
+      <p class="text-slate-500 font-medium">Define los métodos de fabricación disponibles (FDM, SLA, SLS, etc.)</p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      @if (authService.currentUser()?.roles?.includes('ADMIN')) {
+        <div class="lg:col-span-1">
+          <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 sticky top-8">
+            <h2 class="text-xl font-black text-slate-800 mb-6 uppercase tracking-tighter">
+              {{ editando ? 'Editar' : 'Nueva' }} Tecnología
+            </h2>
+
+            <div class="space-y-4">
+              <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase ml-2 mb-1">Nombre de la Tecnología</label>
+                <input [(ngModel)]="nuevaTecno.nombre" placeholder="Ej: FDM (Modelado por deposición fundida)"
+                       class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-medium">
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase ml-2 mb-1">Descripción Comercial</label>
+                <textarea [(ngModel)]="nuevaTecno.descripcion" rows="3" placeholder="Explicación sencilla para el cliente..."
+                          class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-medium resize-none"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase ml-2 mb-1">Especificaciones Técnicas</label>
+                <textarea [(ngModel)]="nuevaTecno.especificacion" rows="3" placeholder="Ej: Precisión 0.1mm, Volumen máx 20x20x20..."
+                          class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-medium resize-none"></textarea>
+              </div>
+
+              <div class="flex items-center gap-3 p-2">
+                <input type="checkbox" [(ngModel)]="nuevaTecno.disponible" id="dispo" class="w-5 h-5 rounded-lg border-slate-200 text-blue-600 focus:ring-blue-500">
+                <label for="dispo" class="text-sm font-bold text-slate-600">¿Tecnología Activa?</label>
+              </div>
+
+              <div class="pt-4 flex gap-2">
+                <button (click)="guardar()"
+                        class="flex-1 bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-xs hover:bg-blue-600 transition-all shadow-lg shadow-blue-100">
+                  {{ editando ? 'Actualizar' : 'Guardar' }}
+                </button>
+                @if (editando) {
+                  <button (click)="cancelarEdicion()" class="bg-slate-100 text-slate-400 px-4 rounded-2xl hover:bg-slate-200 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div [ngClass]="authService.currentUser()?.roles?.includes('ADMIN') ? 'lg:col-span-2' : 'lg:col-span-3'">
+        <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
+          <table class="w-full text-left border-collapse">
+            <thead>
+            <tr class="bg-slate-50/50">
+              <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tecnología</th>
+              <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Especificaciones</th>
+              <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Estado</th>
+              @if (authService.currentUser()?.roles?.includes('ADMIN')) {
+                <th class="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Acciones</th>
+              }
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50">
+              @for (t of tecnologias(); track t.id) {
+                <tr class="hover:bg-blue-50/30 transition-colors group">
+                  <td class="px-8 py-6">
+                    <span class="text-lg font-bold text-slate-800 block leading-tight">{{ t.nombre }}</span>
+                    <span class="text-xs text-slate-400 font-medium">{{ t.descripcion | slice:0:60 }}{{ t.descripcion.length > 60 ? '...' : '' }}</span>
+                  </td>
+                  <td class="px-8 py-6">
+                    <div class="bg-slate-100/50 p-3 rounded-xl border border-slate-100">
+                      <p class="text-[11px] text-slate-600 font-mono leading-relaxed">{{ t.especificacion }}</p>
+                    </div>
+                  </td>
+                  <td class="px-8 py-6">
+                    @if (t.disponible) {
+                      <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-bold bg-green-100 text-green-600">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Activa
+                      </span>
+                    } @else {
+                      <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-bold bg-red-100 text-red-600">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Inactiva
+                      </span>
+                    }
+                  </td>
+                  @if (authService.currentUser()?.roles?.includes('ADMIN')) {
+                    <td class="px-8 py-6 text-right">
+                      <div class="flex justify-end gap-2">
+                        <button (click)="cargarParaEditar(t)" class="p-2 text-slate-400 hover:text-blue-600 transition-colors opacity-0 group-hover:opacity-100">
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        </button>
+                        <button (click)="borrar(t.id)" class="p-2 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                      </div>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          @if (tecnologias().length === 0) {
+            <div class="p-20 text-center">
+              <p class="text-slate-400 font-medium">No hay tecnologías registradas todavía.</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

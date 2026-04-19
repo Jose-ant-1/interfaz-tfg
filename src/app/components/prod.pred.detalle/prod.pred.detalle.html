@@ -60,6 +60,81 @@
         </div>
       </div>
     </div>
+    <div class="mt-12 space-y-6">
+      <h3 class="text-2xl font-black text-slate-900 uppercase italic tracking-tighter">
+        Opiniones ({{ valoraciones().length }})
+      </h3>
+
+      @for (v of valoraciones(); track v.id) {
+        <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100 relative group mb-4">
+
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <p class="font-black text-slate-800 text-sm uppercase">
+                {{ v.usuario?.id || 'Usuario ' + v.usuario?.id }}
+              </p>
+
+              <div class="flex text-yellow-400 text-sm mt-1">
+                @for (star of [1,2,3,4,5]; track star) {
+                  <span>{{ v.puntuacion >= star ? '★' : '☆' }}</span>
+                }
+              </div>
+            </div>
+
+            @if (authService.currentUser(); as user) {
+              @if (user.roles.includes('ADMIN')) {
+                <button (click)="eliminarComentario(v.id!)"
+                        class="text-slate-300 hover:text-red-500 transition-colors p-1"
+                        title="Eliminar valoración">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              }
+            }
+          </div>
+
+          <p class="text-slate-600 italic">"{{ v.comentario }}"</p>
+          <p class="text-[10px] text-slate-400 mt-2 font-bold">{{ v.fechaValoracion }}</p>
+        </div>
+      } @empty {
+        <p class="text-slate-400 italic">Nadie ha valorado este producto todavía.</p>
+      }
+    </div>
+
+    <div class="mt-12 bg-slate-50 rounded-[2.5rem] p-8 border border-slate-200">
+      <h3 class="text-xl font-black text-slate-900 uppercase italic tracking-tighter mb-6">Deja tu opinión</h3>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-black text-slate-400 uppercase mb-2">Puntuación</label>
+          <div class="flex gap-2">
+            @for (star of [1,2,3,4,5]; track star) {
+              <button (click)="nuevaValoracion.puntuacion = star"
+                      class="text-2xl transition-transform active:scale-90"
+                      [class.text-yellow-400]="nuevaValoracion.puntuacion >= star"
+                      [class.text-slate-300]="nuevaValoracion.puntuacion < star">
+                ★
+              </button>
+            }
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black text-slate-400 uppercase mb-2">Tu comentario</label>
+          <textarea [(ngModel)]="nuevaValoracion.comentario"
+                    rows="3"
+                    class="w-full bg-white border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-700 shadow-sm"
+                    placeholder="¿Qué te ha parecido el producto?"></textarea>
+        </div>
+
+        <button (click)="enviarValoracion(producto().id)"
+                [disabled]="!nuevaValoracion.comentario"
+                class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-600 disabled:bg-slate-300 transition-all shadow-lg">
+          {{ cargando() ? 'Enviando...' : 'Publicar Valoración' }}
+        </button>
+      </div>
+    </div>
   </div>
 } @else {
   <div class="flex items-center justify-center h-screen italic text-slate-400 text-xl">Cargando especificaciones...</div>

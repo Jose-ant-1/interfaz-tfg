@@ -17,8 +17,10 @@ export class RegistroComponent {
   // Modelo que coincide con lo que espera tu Entidad Usuario en Java
   registroData = {
     nombre: '',
+    apellidos: '', // Nuevo
     email: '',
-    password: ''
+    telefono: '',  // Nuevo
+    contrasenia: ''
   };
 
   onSubmit() {

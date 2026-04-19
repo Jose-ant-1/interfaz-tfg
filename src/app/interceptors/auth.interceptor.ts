@@ -1,14 +1,19 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = localStorage.getItem('token');
+  const rawToken = localStorage.getItem('token');
 
-  if (token) {
+  if (rawToken) {
+    // 1. Limpieza extrema: eliminamos comillas, espacios, saltos de línea (\n) y retornos de carro (\r)
+    const cleanToken = rawToken.replace(/["']/g, '').replace(/\s+/g, '');
+
     const cloned = req.clone({
       setHeaders: {
-        Authorization: `Bearer ${token}`
+        // 2. Concatenamos en una sola línea literal
+        'Authorization': `Bearer ${cleanToken}`
       }
     });
+
     return next(cloned);
   }
   return next(req);

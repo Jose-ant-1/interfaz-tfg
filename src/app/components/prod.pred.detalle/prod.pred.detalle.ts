@@ -1,13 +1,17 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { ProdPredService } from '../../service/prod.predis.service';
-import { CurrencyPipe } from '@angular/common';
+import {Component, OnInit, inject, signal} from '@angular/core';
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ProdPredService} from '../../service/prod.predis.service';
+import {CurrencyPipe} from '@angular/common';
 import {CarritoService} from '../../service/carrito.service';
+import {AuthService} from '../../service/auth.service';
+import {ValoracionService} from '../../service/valoracion.service';
+import {FormsModule} from '@angular/forms';
+import {ValoracionModel} from '../../models/valoracion.model';
 
 @Component({
   selector: 'app-prod-pred-detalle',
   standalone: true,
-  imports: [CurrencyPipe, RouterLink],
+  imports: [CurrencyPipe, RouterLink, FormsModule],
 
   templateUrl: './prod.pred.detalle.html',
   styleUrl: './prod.pred.detalle.css'
@@ -17,8 +21,18 @@ export class DetalleProductoPredis implements OnInit {
   private route = inject(ActivatedRoute);
   private prodService = inject(ProdPredService);
   private carritoService = inject(CarritoService);
+  private valoracionService = inject(ValoracionService);
+  public authService = inject(AuthService);
 
   producto = signal<any>(null);
+  valoraciones = signal<ValoracionModel[]>([]);
+  cargando = signal<boolean>(false);
+
+  nuevaValoracion: ValoracionModel = {
+    puntuacion: 5,
+    comentario: ''
+    // Ahora TS ya no se queja de la falta de fechaValoracion ni de IDs
+  };
 
 
   agregarAlCarrito(p: any) {
@@ -38,16 +52,57 @@ export class DetalleProductoPredis implements OnInit {
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-
-      this.prodService.obtenerPorId(+id).subscribe({
-
-        next: (p: any) => {
+      const pId = +id;
+      this.prodService.obtenerPorId(pId).subscribe({
+        next: (p) => {
           this.producto.set(p);
-        },
-        error: (err: any) => {
-          console.error('Producto no encontrado', err);
+          this.cargarListaValoraciones(pId); // <--- CARGAR AL INICIAR
         }
       });
     }
   }
+
+  cargarListaValoraciones(id: number) {
+    this.valoracionService.obtenerPorProducto(id).subscribe({
+      next: (res) => this.valoraciones.set(res)
+    });
+  }
+
+  enviarValoracion(productoId: number) {
+    const user = this.authService.currentUser();
+
+    // Validamos solo que el objeto de usuario exista (sesión iniciada)
+    if (!user) {
+      console.warn('⚠️ No hay sesión activa');
+      return;
+    }
+
+    const valoracion: any = {
+      puntuacion: Number(this.nuevaValoracion.puntuacion),
+      comentario: this.nuevaValoracion.comentario,
+      producto: { id: productoId }
+      // No hace falta enviar 'usuario' ni 'fechaValoracion', el back los pone
+    };
+
+    this.valoracionService.guardarValoracion(valoracion).subscribe({
+      next: () => {
+        this.nuevaValoracion = { puntuacion: 5, comentario: '' };
+        this.cargarListaValoraciones(productoId);
+      },
+      error: (err) => console.error('Error al guardar:', err)
+    });
+  }
+
+  eliminarComentario(id: number) {
+    if (confirm('¿Estás seguro de que quieres borrar este comentario?')) {
+      this.valoracionService.delete(id).subscribe({
+        next: () => {
+          // Esto actualiza la lista visualmente sin recargar la página
+          this.valoraciones.update(lista => lista.filter(v => v.id !== id));
+        },
+        error: (err) => console.error('Error al eliminar:', err)
+      });
+    }
+  }
+
 }
