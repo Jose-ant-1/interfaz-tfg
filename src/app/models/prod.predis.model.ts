@@ -1,18 +1,20 @@
 export interface Producto {
   id?: number;
-  nombreProducto: string;
-  descripcion: string;
-  precio: number;
-  stockDisponible: number;
-  dimensiones?: string;
-  pesoGramos: number;
-  imagenUrl: string;
-  tiempoImpresionMinutos: number;
-  idCategoria: number;
-  caracteristicas?: string;
-  destacado: boolean;
-  disponible: boolean;
+  nombreProducto: string;       // nombre_producto
+  descripcion: string;          // descripción
+  caracteristicas: string;      // caracteristicas
+  precio: number;               // precio
+  stockDisponible: number;      // Stock_disponible
+  dimensiones: string;          // dimensiones
+  pesoGramos: number;           // peso_gramos
+  tiempoImpresionMinutos: number; // tiempo_impresion_minutos
+  imagenUrl: string;            // imagen_url
+  destacado: boolean;           // destacado
+  disponible: boolean;          // disponible
+  fechaCreacion?: string;       // fecha_creacion
+  fechaActualizacion?: string;  // fecha_actualizacion
 
-  material?: any;
-  tecnologia?: any;
+  // Relaciones (Objetos completos para los combos)
+  material?: any;               // id_material
+  tecnologia?: any;             // id_tecnologia
 }

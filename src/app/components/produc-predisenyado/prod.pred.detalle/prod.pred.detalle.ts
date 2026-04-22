@@ -1,18 +1,17 @@
 import {Component, OnInit, inject, signal} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {ProdPredService} from '../../service/prod.predis.service';
-import {CurrencyPipe} from '@angular/common';
-import {CarritoService} from '../../service/carrito.service';
-import {AuthService} from '../../service/auth.service';
-import {ValoracionService} from '../../service/valoracion.service';
+import {ProdPredService} from '../../../service/prod.predis.service';
+import {CommonModule, CurrencyPipe, DatePipe} from '@angular/common';
+import {CarritoService} from '../../../service/carrito.service';
+import {AuthService} from '../../../service/auth.service';
+import {ValoracionService} from '../../../service/valoracion.service';
 import {FormsModule} from '@angular/forms';
-import {ValoracionModel} from '../../models/valoracion.model';
+import {ValoracionModel} from '../../../models/valoracion.model';
 
 @Component({
   selector: 'app-prod-pred-detalle',
   standalone: true,
-  imports: [CurrencyPipe, RouterLink, FormsModule],
-
+  imports: [CommonModule, CurrencyPipe, DatePipe, RouterLink, FormsModule],
   templateUrl: './prod.pred.detalle.html',
   styleUrl: './prod.pred.detalle.css'
 })

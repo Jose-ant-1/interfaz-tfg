@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { PedidoService } from '../../service/pedido.service';
+import { PedidoService } from '../../../service/pedido.service';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 
 @Component({

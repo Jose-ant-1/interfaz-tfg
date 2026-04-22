@@ -1,0 +1,203 @@
+@if (producto()) {
+  <div class="min-h-screen bg-slate-50 p-6 md:p-12">
+    <div class="max-w-6xl mx-auto">
+
+      <a routerLink="/productos"
+         class="flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors mb-8 font-semibold">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Volver al catálogo
+      </a>
+
+      <div class="bg-white rounded-[3rem] shadow-xl overflow-hidden border border-slate-100 mb-16">
+        <div class="grid grid-cols-1 md:grid-cols-2">
+
+          <div class="bg-slate-100 flex items-center justify-center p-8 relative min-h-[400px]">
+            @if (producto().destacado) {
+              <span
+                class="absolute top-6 left-6 bg-orange-500 text-white text-xs font-black px-4 py-2 rounded-full uppercase tracking-widest shadow-lg">Destacado</span>
+            }
+            @if (!producto().disponible) {
+              <span
+                class="absolute top-6 right-6 bg-red-600 text-white text-xs font-black px-4 py-2 rounded-full uppercase tracking-widest shadow-lg">No disponible</span>
+            }
+
+            @if (producto().imagenUrl) {
+              <img [src]="producto().imagenUrl" [alt]="producto().nombreProducto"
+                   class="w-full h-full object-contain drop-shadow-2xl transition-transform hover:scale-105 duration-500">
+            } @else {
+              <div class="text-slate-300 flex flex-col items-center">
+                <svg class="w-32 h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-width="1"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+            }
+          </div>
+
+          <div class="p-8 md:p-12 flex flex-col">
+            <div class="mb-6">
+              <span class="text-blue-600 font-black uppercase tracking-widest text-xs">Información General</span>
+              <h1 class="text-4xl font-black text-slate-900 leading-none mt-2">{{ producto().nombreProducto }}</h1>
+              <p class="text-3xl font-light text-slate-400 mt-4">{{ producto().precio | currency:'EUR' }}</p>
+            </div>
+
+            <div class="space-y-6 flex-grow">
+              <div>
+                <label
+                  class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Descripción</label>
+                <p class="text-slate-600 leading-relaxed font-medium">{{ producto().descripcion }}</p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4 border-y border-slate-100 py-8">
+                <div>
+                  <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Material</span>
+                  <span class="text-slate-800 font-bold">{{ producto().material?.nombreMaterial || 'Estándar' }}</span>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Tecnología</span>
+                  <span class="text-slate-800 font-bold">{{ producto().tecnologia?.nombre || 'FDM' }}</span>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Dimensiones</span>
+                  <span class="text-slate-800 font-bold">{{ producto().dimensiones || 'Ver descripción' }}</span>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Peso</span>
+                  <span class="text-slate-800 font-bold">{{ producto().pesoGramos }}g</span>
+                </div>
+                <div>
+                  <span
+                    class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Disponibilidad</span>
+                  <span class="font-bold" [class.text-green-600]="producto().stockDisponible > 0"
+                        [class.text-red-500]="producto().stockDisponible <= 0">
+                    {{ producto().stockDisponible > 0 ? 'En Stock' : 'Agotado' }}
+                  </span>
+                </div>
+                <div>
+                  <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Impresión</span>
+                  <span class="text-slate-800 font-bold">{{ producto().tiempoImpresionMinutos }} min</span>
+                </div>
+              </div>
+
+              @if (producto().caracteristicas) {
+                <div>
+                  <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Características
+                    Extra</label>
+                  <p
+                    class="text-sm text-slate-500 italic bg-slate-50 p-4 rounded-2xl">{{ producto().caracteristicas }}</p>
+                </div>
+              }
+            </div>
+
+            <div class="mt-8 flex gap-4">
+              <button (click)="agregarAlCarrito(producto())"
+                      [disabled]="!producto().disponible || producto().stockDisponible <= 0"
+                      class="flex-grow bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-tighter shadow-xl hover:bg-blue-600 transition-all active:scale-95 disabled:bg-slate-200 disabled:text-slate-400">
+                {{ producto().stockDisponible > 0 ? 'Añadir al carrito' : 'Sin Stock' }}
+              </button>
+            </div>
+
+            <div class="mt-4 text-[10px] text-slate-300 flex justify-between uppercase font-bold tracking-widest">
+              <span>Ref: {{ producto().fechaCreacion | date:'yyyyMMdd' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+        <div class="lg:col-span-2 space-y-6">
+          <h3 class="text-2xl font-black text-slate-900 uppercase italic tracking-tighter flex items-center gap-3">
+            Opiniones
+            <span
+              class="bg-slate-200 text-slate-600 text-sm px-3 py-1 rounded-full not-italic">{{ valoraciones().length }}</span>
+          </h3>
+
+          <div class="space-y-4">
+            @for (v of valoraciones(); track v.id) {
+              <div
+                class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 group transition-all hover:border-blue-200">
+                <div class="flex justify-between items-start mb-3">
+                  <div>
+                    <p class="font-black text-slate-800 text-xs uppercase tracking-widest mb-1">
+                      {{ v.usuario?.nombre || 'Explorador 3D' }}
+                    </p>
+                    <div class="flex text-yellow-400 text-xs">
+                      @for (star of [1, 2, 3, 4, 5]; track star) {
+                        <span>{{ v.puntuacion >= star ? '★' : '☆' }}</span>
+                      }
+                    </div>
+                  </div>
+
+                  @if (authService.currentUser()?.roles?.includes('ADMIN')) {
+                    <button (click)="eliminarComentario(v.id!)"
+                            class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all p-2 bg-slate-50 rounded-xl">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-width="2"
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  }
+                </div>
+                <p class="text-slate-600 text-sm font-medium italic">"{{ v.comentario }}"</p>
+                <p
+                  class="text-[9px] text-slate-400 mt-4 font-black uppercase tracking-tighter">{{ v.fechaValoracion | date:'dd MMM yyyy' }}</p>
+              </div>
+            } @empty {
+              <div class="bg-slate-100/50 border-2 border-dashed border-slate-200 rounded-3xl p-12 text-center">
+                <p class="text-slate-400 font-bold uppercase text-xs tracking-widest">Sé el primero en opinar sobre este
+                  producto</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-xl shadow-slate-200/50 sticky top-8">
+            <h3 class="text-xl font-black text-slate-900 uppercase italic tracking-tighter mb-6">Tu experiencia</h3>
+
+            <div class="space-y-6">
+              <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">¿Cuántas
+                  estrellas le das?</label>
+                <div class="flex gap-2">
+                  @for (star of [1, 2, 3, 4, 5]; track star) {
+                    <button (click)="nuevaValoracion.puntuacion = star"
+                            class="text-3xl transition-all hover:scale-110 active:scale-90"
+                            [class.text-yellow-400]="nuevaValoracion.puntuacion >= star"
+                            [class.text-slate-200]="nuevaValoracion.puntuacion < star">
+                      ★
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Cuéntanos
+                  más</label>
+                <textarea [(ngModel)]="nuevaValoracion.comentario"
+                          rows="4"
+                          class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-700 text-sm"
+                          placeholder="Calidad del material, detalles..."></textarea>
+              </div>
+
+              <button (click)="enviarValoracion(producto().id)"
+                      [disabled]="!nuevaValoracion.comentario || cargando()"
+                      class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-900 transition-all shadow-lg shadow-blue-100 disabled:bg-slate-100 disabled:text-slate-300">
+                {{ cargando() ? 'Enviando...' : 'Publicar Opinión' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="flex flex-col items-center justify-center h-screen bg-slate-50">
+    <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+    <span class="font-black text-slate-400 uppercase text-xs tracking-widest">Cargando Ficha Técnica...</span>
+  </div>
+}

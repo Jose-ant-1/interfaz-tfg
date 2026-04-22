@@ -1,0 +1,61 @@
+<div class="min-h-screen bg-slate-50 p-6 md:p-12">
+  <div class="max-w-4xl mx-auto">
+
+    <header class="mb-10">
+      <h1 class="text-4xl font-black text-slate-900 tracking-tight uppercase italic">
+        Solicitud <span class="text-blue-600">Personalizada</span>
+      </h1>
+      <p class="text-slate-500 font-medium italic">Cuéntanos tu idea y nuestro equipo técnico la hará realidad.</p>
+    </header>
+
+    <div class="bg-white rounded-[3rem] shadow-xl border border-slate-100 overflow-hidden">
+      <div class="p-8 md:p-12">
+        <form (ngSubmit)="enviarSolicitud()" class="space-y-8">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Nombre del Proyecto</label>
+              <input type="text" [(ngModel)]="solicitud.nombre" name="nombre"
+                     placeholder="Ej: Soporte Auriculares Gamer"
+                     class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-700">
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Material Preferido</label>
+              <select [(ngModel)]="solicitud.material" name="material"
+                      class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-700">
+                <option [ngValue]="null">Cualquier material</option>
+                @for (m of materiales(); track m.id) {
+                  <option [ngValue]="m">{{ m.nombreMaterial }} ({{ m.color }})</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Detalles del diseño o URL del archivo (STL/OBJ)</label>
+            <textarea [(ngModel)]="solicitud.detalles" name="detalles" rows="5"
+                      placeholder="Describe las dimensiones, uso que le vas a dar o pega un enlace a Drive/Dropbox con tu archivo 3D..."
+                      class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-700"></textarea>
+          </div>
+
+          <div class="bg-blue-50 rounded-2xl p-6 border border-blue-100 flex gap-4 items-start">
+            <div class="bg-blue-600 text-white p-2 rounded-lg">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div>
+              <h4 class="text-blue-900 font-black uppercase text-xs mb-1">¿Qué pasará ahora?</h4>
+              <p class="text-blue-700 text-sm">Al confirmar, tu solicitud aparecerá en <strong>"Mis Pedidos"</strong> como <strong>EVALUANDO</strong>. Revisaremos la viabilidad técnica y te asignaremos un precio en menos de 24h.</p>
+            </div>
+          </div>
+
+          <button type="submit"
+                  [disabled]="!solicitud.nombre || !solicitud.detalles || cargando()"
+                  class="w-full bg-slate-900 text-white py-6 rounded-3xl font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl active:scale-95 disabled:bg-slate-200 disabled:text-slate-400">
+            {{ cargando() ? 'Procesando Solicitud...' : 'Confirmar y Enviar a Revisión' }}
+          </button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

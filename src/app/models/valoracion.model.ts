@@ -4,6 +4,6 @@ export interface ValoracionModel {
   puntuacion: number;
   comentario: string;
   fechaValoracion?: string;
-  usuario?: { id: number };   // Simplificado para que acepte {id: X}
+  usuario?: { id: number; nombre?: string };   // Simplificado para que acepte {id: X}
   producto?: { id: number };  // Simplificado para que acepte {id: X}
 }

@@ -1,10 +1,10 @@
 // catalogo.ts
 import { Component, inject, OnInit } from '@angular/core';
-import { ProdPredService } from '../../service/prod.predis.service';
+import { ProdPredService } from '../../../service/prod.predis.service';
 import { CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CarritoService } from '../../service/carrito.service';
-import { AuthService } from '../../service/auth.service'; // <--- Importar
+import { CarritoService } from '../../../service/carrito.service';
+import { AuthService } from '../../../service/auth.service'; // <--- Importar
 
 @Component({
   selector: 'app-catalogo',

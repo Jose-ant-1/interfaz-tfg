@@ -27,11 +27,6 @@
             @if (producto.imagenUrl) {
               <img [src]="producto.imagenUrl" [alt]="producto.nombreProducto" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
             }
-            <div class="absolute top-6 left-6">
-              <span class="bg-slate-900/90 backdrop-blur-md text-white text-xs font-black px-3 py-1.5 rounded-xl uppercase tracking-widest">
-                {{ producto.idCategoria === 1 ? 'Premium' : 'Estándar' }}
-              </span>
-            </div>
           </div>
 
           <div class="p-8">

@@ -1,9 +1,9 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { UsuarioService } from '../../service/usuario.service';
+import { UsuarioService } from '../../../service/usuario.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Usuario } from '../../models/usuario.model';
+import { Usuario } from '../../../models/usuario.model';
 
 @Component({
   selector: 'app-edit-usuario',

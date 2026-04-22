@@ -1,0 +1,129 @@
+<div class="min-h-screen bg-slate-50 p-6 md:p-12">
+  <div class="max-w-5xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+      <a routerLink="/productos" class="text-slate-500 hover:text-blue-600 font-bold flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        Volver
+      </a>
+      <h1 class="text-2xl font-black text-slate-900 uppercase italic">Editar Ficha Técnica</h1>
+    </div>
+
+    @if (producto()) {
+      <form (ngSubmit)="guardarCambios()" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div class="space-y-6">
+          <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+            <label class="block text-xs font-black text-slate-400 uppercase mb-4 text-center">Imagen del Producto</label>
+            <div class="aspect-square bg-slate-50 rounded-2xl mb-4 overflow-hidden border-2 border-dashed border-slate-200 flex items-center justify-center">
+              @if (producto().imagenUrl) {
+                <img [src]="producto().imagenUrl" class="w-full h-full object-contain p-2">
+              } @else {
+                <span class="text-slate-300 text-sm">Sin imagen</span>
+              }
+            </div>
+            <input type="text" [(ngModel)]="producto().imagenUrl" name="imagenUrl" placeholder="URL de la imagen"
+                   class="w-full p-3 bg-slate-50 rounded-xl border-none text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-4">
+            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+              <label class="text-xs font-bold text-slate-600 uppercase">Disponible</label>
+              <input type="checkbox" [(ngModel)]="producto().disponible" name="disponible" class="w-5 h-5 accent-blue-600">
+            </div>
+            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+              <label class="text-xs font-bold text-slate-600 uppercase">Destacado</label>
+              <input type="checkbox" [(ngModel)]="producto().destacado" name="destacado" class="w-5 h-5 accent-orange-500">
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 space-y-6">
+          <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6">
+
+            <div>
+              <label class="block text-xs font-black text-slate-400 uppercase mb-2">Nombre del Producto</label>
+              <input type="text" [(ngModel)]="producto().nombreProducto" name="nombre"
+                     class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none font-bold text-slate-700 focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase mb-2">Precio (€)</label>
+                <input type="number" step="0.01" [(ngModel)]="producto().precio" name="precio"
+                       class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none font-bold">
+              </div>
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase mb-2">Stock</label>
+                <input type="number" [(ngModel)]="producto().stockDisponible" name="stock"
+                       class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none font-bold">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-black text-slate-400 uppercase mb-2">Descripción Corta</label>
+              <textarea [(ngModel)]="producto().descripcion" name="desc" rows="2"
+                        class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none text-slate-600"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-black text-slate-400 uppercase mb-2">Características Detalladas</label>
+              <textarea [(ngModel)]="producto().caracteristicas" name="caract" rows="3"
+                        class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none text-slate-600"></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase mb-2">Dimensiones</label>
+                <input type="text" [(ngModel)]="producto().dimensiones" name="dims" placeholder="20x20x20cm"
+                       class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none text-sm font-bold">
+              </div>
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase mb-2">Peso (g)</label>
+                <input type="number" [(ngModel)]="producto().pesoGramos" name="peso"
+                       class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none text-sm font-bold">
+              </div>
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase mb-2">Tiempo (min)</label>
+                <input type="number" [(ngModel)]="producto().tiempoImpresionMinutos" name="tiempo"
+                       class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none text-sm font-bold">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase mb-2 text-blue-600">Material</label>
+                <select [(ngModel)]="producto().material" name="mat" [compareWith]="compareObjects"
+                        class="w-full bg-blue-50 p-4 rounded-xl border-none outline-none font-bold text-blue-700">
+                  <option [ngValue]="null">Sin asignar</option>
+                  @for (m of materiales(); track m.id) {
+                    <option [ngValue]="m">{{ m.nombreMaterial }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-black text-slate-400 uppercase mb-2 text-purple-600">Tecnología</label>
+                <select [(ngModel)]="producto().tecnologia" name="tec" [compareWith]="compareObjects"
+                        class="w-full bg-purple-50 p-4 rounded-xl border-none outline-none font-bold text-purple-700">
+                  <option [ngValue]="null">Sin asignar</option>
+                  @for (t of tecnologias(); track t.id) {
+                    <option [ngValue]="t">{{ t.nombre }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl active:scale-95">
+              Actualizar Base de Datos
+            </button>
+
+          </div>
+        </div>
+      </form>
+    } @else {
+      <div class="flex flex-col items-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Cargando datos del producto...</p>
+      </div>
+    }
+  </div>
+</div>

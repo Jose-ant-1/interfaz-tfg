@@ -1,8 +1,8 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { PedidoService } from '../../service/pedido.service';
-import { Pedido } from '../../models/pedido.model'; // Usamos el nuevo modelo
+import { PedidoService } from '../../../service/pedido.service';
+import { Pedido } from '../../../models/pedido.model'; // Usamos el nuevo modelo
 
 @Component({
   selector: 'app-mis-pedidos',

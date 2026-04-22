@@ -1,0 +1,93 @@
+<div class="min-h-screen bg-slate-50 p-6 md:p-12">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl font-black text-slate-900 uppercase italic mb-8">Nuevo Producto Prediseñado</h1>
+
+    <div class="bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
+      <form #f="ngForm" (ngSubmit)="guardarNuevo()" class="space-y-6">
+
+        <div class="bg-slate-50 p-6 rounded-2xl border-2 border-dashed border-slate-200">
+          <label class="block text-xs font-black text-slate-400 uppercase mb-2">URL de la Imagen</label>
+          <input type="text" [(ngModel)]="producto().imagenUrl" name="imagenUrl" class="w-full p-3 rounded-xl border-none outline-none">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="text-xs font-black text-slate-400 uppercase">Nombre del Producto</label>
+            <input type="text" [(ngModel)]="producto().nombreProducto" name="nombreProducto" required class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none">
+          </div>
+          <div>
+            <label class="text-xs font-black text-slate-400 uppercase">Precio (€)</label>
+            <input type="number" [(ngModel)]="producto().precio" name="precio" required class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="text-xs font-black text-slate-400 uppercase">Descripción</label>
+            <textarea [(ngModel)]="producto().descripcion" name="descripcion" rows="3" class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none"></textarea>
+          </div>
+          <div>
+            <label class="text-xs font-black text-slate-400 uppercase">Características Técnicas</label>
+            <textarea [(ngModel)]="producto().caracteristicas" name="caracteristicas" rows="3" class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none"></textarea>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label class="text-xs font-black text-slate-400 uppercase">Stock Disponible</label>
+            <input type="number" [(ngModel)]="producto().stockDisponible" name="stockDisponible" class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none">
+          </div>
+          <div>
+            <label class="text-xs font-black text-slate-400 uppercase">Dimensiones</label>
+            <input type="text" [(ngModel)]="producto().dimensiones" name="dimensiones" placeholder="Ej: 20x20x20" class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none">
+          </div>
+          <div>
+            <label class="text-xs font-black text-slate-400 uppercase">Peso (gramos)</label>
+            <input type="number" [(ngModel)]="producto().pesoGramos" name="pesoGramos" class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
+          <div>
+            <label class="text-xs font-black text-slate-400 uppercase">Tiempo Impresión (min)</label>
+            <input type="number" [(ngModel)]="producto().tiempoImpresionMinutos" name="tiempoImpresionMinutos" class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="text-xs font-black text-slate-400 uppercase">Material</label>
+            <select [(ngModel)]="producto().material" name="material" required class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none">
+              <option [ngValue]="null">Selecciona Material</option>
+              @for (m of materiales(); track m.id) { <option [ngValue]="m">{{m.nombreMaterial}}</option> }
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-black text-slate-400 uppercase">Tecnología</label>
+            <select [(ngModel)]="producto().tecnologia" name="tecnologia" required class="w-full bg-slate-50 p-4 rounded-xl border-none outline-none">
+              <option [ngValue]="null">Selecciona Tecnología</option>
+              @for (t of tecnologias(); track t.id) { <option [ngValue]="t">{{t.nombre}}</option> }
+            </select>
+          </div>
+        </div>
+
+        <div class="flex gap-8 p-4 bg-slate-50 rounded-2xl">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="producto().destacado" name="destacado" class="w-5 h-5">
+            <span class="text-xs font-black text-slate-600 uppercase">Producto Destacado</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" [(ngModel)]="producto().disponible" name="disponible" class="w-5 h-5">
+            <span class="text-xs font-black text-slate-600 uppercase">Disponible</span>
+          </label>
+        </div>
+
+        <p class="text-[10px] text-slate-400 italic">* Las fechas de creación y actualización se generan automáticamente al guardar.</p>
+
+        <button type="submit" [disabled]="f.invalid" class="w-full bg-green-600 text-white py-5 rounded-2xl font-black uppercase hover:bg-slate-900 transition-all disabled:bg-slate-200">
+          Guardar Producto Completo
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
