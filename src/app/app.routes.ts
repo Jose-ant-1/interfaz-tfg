@@ -14,6 +14,7 @@ import {AdminMaterialesComponent} from './components/materiales/materiales';
 import {AdminTecnologiasComponent} from './components/tecnologias/tecnologias';
 import {CrearProdPredis} from './components/produc-predisenyado/crear-prod-predis/crear-prod-predis';
 import {PedidoPersonalizadoComponent} from './components/solicitud-personalizada/solicitud-personalizada';
+import {DetallePedidoComponent} from './components/pedidos/detalle-pedido/detalle-pedido';
 
 export const routes: Routes = [
   // --- RUTAS ABIERTAS (Públicas) ---
@@ -36,9 +37,8 @@ export const routes: Routes = [
   {path: 'admin/usuarios/nuevo', component: EditUsuarioComponent, canActivate: [authGuard]},
 
   // Pedidos personalizados
-  // En app.routes.ts
   {path: 'pedido-personalizado', component: PedidoPersonalizadoComponent, canActivate: [authGuard]},
-
+  { path: 'pedidos/:id', component: DetallePedidoComponent },
 
   // Gestión de productos
   {path: 'productos/nuevo', component: CrearProdPredis, canActivate: [authGuard]}, // 1º LA ESPECÍFICA

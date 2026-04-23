@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Pedido } from '../models/pedido.model';
-import {Observable} from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,18 +12,24 @@ export class PedidoService {
 
   pedidos = signal<Pedido[]>([]);
 
+  // Obtener todos (Solo Admin)
   obtenerTodos(): void {
     this.http.get<Pedido[]>(this.apiUrl).subscribe(data => {
       this.pedidos.set(data);
     });
   }
 
+  // NUEVO: Obtener un pedido por ID (Dueño o Admin)
+  getPedidoById(id: number): Observable<Pedido> {
+    return this.http.get<Pedido>(`${this.apiUrl}/${id}`);
+  }
+
+  // Obtener lista del usuario actual
+  getMisPedidos(): Observable<Pedido[]> {
+    return this.http.get<Pedido[]>(`${this.apiUrl}/mis-pedidos`);
+  }
+
   actualizarEstado(id: number, nuevoEstado: string) {
     return this.http.patch(`${this.apiUrl}/${id}/estado`, { estado: nuevoEstado });
   }
-
-  getMisPedidos(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/mis-pedidos`);
-  }
-
 }
