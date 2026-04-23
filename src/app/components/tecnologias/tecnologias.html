@@ -9,7 +9,6 @@
           Nuestras <span class="text-blue-600">Tecnologías</span>
         }
       </h1>
-      <p class="text-slate-500 font-medium">Define los métodos de fabricación disponibles (FDM, SLA, SLS, etc.)</p>
     </header>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -29,20 +28,20 @@
               </div>
 
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase ml-2 mb-1">Descripción Comercial</label>
-                <textarea [(ngModel)]="nuevaTecno.descripcion" rows="3" placeholder="Explicación sencilla para el cliente..."
-                          class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-medium resize-none"></textarea>
+                <label class="block text-[10px] font-black text-slate-400 uppercase ml-2 mb-1">Descripción General</label>
+                <textarea [(ngModel)]="nuevaTecno.descripcion" rows="3"
+                          class="w-full bg-slate-50 rounded-2xl p-4 outline-none text-sm" placeholder="¿En qué consiste esta tecnología?"></textarea>
               </div>
 
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase ml-2 mb-1">Especificaciones Técnicas</label>
-                <textarea [(ngModel)]="nuevaTecno.especificacion" rows="3" placeholder="Ej: Precisión 0.1mm, Volumen máx 20x20x20..."
-                          class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-medium resize-none"></textarea>
+                <textarea [(ngModel)]="nuevaTecno.especificacion" rows="3"
+                          class="w-full bg-slate-50 rounded-2xl p-4 outline-none text-sm" placeholder="Precisión, volumen de impresión, etc."></textarea>
               </div>
 
               <div class="flex items-center gap-3 p-2">
-                <input type="checkbox" [(ngModel)]="nuevaTecno.disponible" id="dispo" class="w-5 h-5 rounded-lg border-slate-200 text-blue-600 focus:ring-blue-500">
-                <label for="dispo" class="text-sm font-bold text-slate-600">¿Tecnología Activa?</label>
+                <input type="checkbox" [(ngModel)]="nuevaTecno.disponible" name="disponible" id="dispTec" class="w-5 h-5 accent-blue-600">
+                <label for="dispTec" class="text-sm font-bold text-slate-700 uppercase tracking-tighter">Activar Tecnología</label>
               </div>
 
               <div class="pt-4 flex gap-2">
@@ -76,40 +75,74 @@
             </thead>
             <tbody class="divide-y divide-slate-50">
               @for (t of tecnologias(); track t.id) {
-                <tr class="hover:bg-blue-50/30 transition-colors group">
+                <tr (click)="toggleFila(t.id)" class="hover:bg-blue-50/30 transition-colors group cursor-pointer">
                   <td class="px-8 py-6">
-                    <span class="text-lg font-bold text-slate-800 block leading-tight">{{ t.nombre }}</span>
-                    <span class="text-xs text-slate-400 font-medium">{{ t.descripcion | slice:0:60 }}{{ t.descripcion.length > 60 ? '...' : '' }}</span>
-                  </td>
-                  <td class="px-8 py-6">
-                    <div class="bg-slate-100/50 p-3 rounded-xl border border-slate-100">
-                      <p class="text-[11px] text-slate-600 font-mono leading-relaxed">{{ t.especificacion }}</p>
+                    <div class="flex items-center gap-3">
+                      <svg class="w-4 h-4 transition-transform text-slate-300"
+                           [class.rotate-90]="idFilaExpandida() === t.id"
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                      <span class="text-lg font-bold text-slate-800 block leading-tight">{{ t.nombre }}</span>
                     </div>
                   </td>
+
+                  <td class="px-8 py-6">
+                    <div class="max-w-[180px]">
+                      <p class="text-[11px] text-slate-500 font-mono truncate" [title]="t.especificacion">
+                        {{ t.especificacion }}
+                      </p>
+                    </div>
+                  </td>
+
                   <td class="px-8 py-6">
                     @if (t.disponible) {
-                      <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-bold bg-green-100 text-green-600">
+                      <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-[10px] font-black uppercase bg-green-100 text-green-600">
                         <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Activa
                       </span>
                     } @else {
-                      <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-bold bg-red-100 text-red-600">
+                      <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-[10px] font-black uppercase bg-red-100 text-red-600">
                         <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Inactiva
                       </span>
                     }
                   </td>
+
                   @if (authService.currentUser()?.roles?.includes('ADMIN')) {
                     <td class="px-8 py-6 text-right">
                       <div class="flex justify-end gap-2">
-                        <button (click)="cargarParaEditar(t)" class="p-2 text-slate-400 hover:text-blue-600 transition-colors opacity-0 group-hover:opacity-100">
+                        <button (click)="$event.stopPropagation(); cargarParaEditar(t)"
+                                class="p-2 text-slate-400 hover:text-blue-600 transition-colors opacity-0 group-hover:opacity-100">
                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         </button>
-                        <button (click)="borrar(t.id)" class="p-2 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                        <button (click)="$event.stopPropagation(); borrar(t.id)"
+                                class="p-2 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                       </div>
                     </td>
                   }
                 </tr>
+
+                @if (idFilaExpandida() === t.id) {
+                  <tr class="bg-slate-50/50">
+                    <td colspan="4" class="px-12 py-8">
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fadeIn">
+                        <div>
+                          <h4 class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Descripción General</h4>
+                          <p class="text-sm text-slate-600 leading-relaxed italic">
+                            {{ t.descripcion || 'No hay descripción detallada.' }}
+                          </p>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                          <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Ficha Técnica Completa</h4>
+                          <div class="bg-slate-50 p-4 rounded-xl text-xs font-mono text-slate-600">
+                            {{ t.especificacion }}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                }
               }
             </tbody>
           </table>

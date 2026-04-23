@@ -11,7 +11,6 @@ export interface SolicitudPersonalizada {
   descripcion: string;
   requisitosEspeciales?: string;
   acabado?: string;
-  urgente: boolean;
   estado: string; // 'EVALUANDO', 'PRESUPUESTADO', etc.
   fechaSolicitud?: string;
   fechaActualizacion?: string;

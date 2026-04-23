@@ -9,13 +9,14 @@ import { Tecnologia } from '../../models/configuracion.model';
   selector: 'app-admin-tecnologias',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './tecnologias.html'
+  templateUrl: './tecnologias.html',
 })
 export class AdminTecnologiasComponent implements OnInit {
   private configService = inject(AdminConfigService);
   public authService = inject(AuthService); // <--- Inyectar para que el HTML lo vea
 
   tecnologias = signal<Tecnologia[]>([]);
+  idFilaExpandida = signal<number | null>(null);
   nuevaTecno: Tecnologia = this.resetForm();
   editando = false;
 
@@ -24,7 +25,12 @@ export class AdminTecnologiasComponent implements OnInit {
   }
 
   cargarTecnologias() {
-    this.configService.getTecnologias().subscribe(res => this.tecnologias.set(res));
+    this.configService.getTecnologias().subscribe((res) => this.tecnologias.set(res));
+  }
+
+  toggleFila(id: number | undefined) {
+    if (!id) return;
+    this.idFilaExpandida.set(this.idFilaExpandida() === id ? null : id);
   }
 
   // --- MÉTODOS QUE FALTABAN Y CAUSABAN ERRORES ---
@@ -50,14 +56,14 @@ export class AdminTecnologiasComponent implements OnInit {
         next: () => {
           this.cargarTecnologias();
           this.cancelarEdicion();
-        }
+        },
       });
     } else {
       this.configService.saveTecnologia(this.nuevaTecno).subscribe({
         next: () => {
           this.cargarTecnologias();
           this.nuevaTecno = this.resetForm();
-        }
+        },
       });
     }
   }
@@ -65,7 +71,7 @@ export class AdminTecnologiasComponent implements OnInit {
   borrar(id: number | undefined) {
     if (!id || !confirm('¿Eliminar esta tecnología?')) return;
     this.configService.deleteTecnologia(id).subscribe(() => {
-      this.tecnologias.update(list => list.filter(t => t.id !== id));
+      this.tecnologias.update((list) => list.filter((t) => t.id !== id));
     });
   }
 
@@ -74,7 +80,7 @@ export class AdminTecnologiasComponent implements OnInit {
       nombre: '',
       descripcion: '',
       especificacion: '',
-      disponible: true
+      disponible: true,
     };
   }
 }

@@ -1,21 +1,23 @@
 export interface Material {
   id?: number;
-  nombreMaterial: string;
-  tipo: string;
+  nombreMaterial: string; // nombre_material en Java
+  tipo: string; // Filamento, Resina, etc.
   descripcion: string;
   color: string;
-  precioPorGramo: number;
-  stockGramo: number;
-  propiedades?: string; // Añadido para coincidir con Java
-  imagen?: string;      // Añadido para coincidir con Java
+  precioPorGramo: number; // precio_por_gramo (Double)
+  stockGramo: number; // stock_gramo (Double)
+  propiedades: string; // TEXT en Java para propiedades mecánicas
   disponible: boolean;
-  fechaCreacion?: string; // Las fechas de Java se reciben como string en TS
+  fechaCreacion?: string; // LocalDate se recibe como ISO string
+
+  // Nota: No incluimos la relación 'productos' o 'solicitudes' para evitar
+  // recursividad infinita en el JSON, a menos que el Back use DTOs.
 }
 
 export interface Tecnologia {
   id?: number;
   nombre: string;
-  descripcion: string;
-  especificacion: string;
+  descripcion: string; // TEXT
+  especificacion: string; // TEXT para detalles técnicos (velocidad, precisión...)
   disponible: boolean;
 }

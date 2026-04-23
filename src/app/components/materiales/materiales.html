@@ -1,6 +1,6 @@
 <div class="min-h-screen bg-slate-50 p-6 md:p-12">
   <div class="max-w-6xl mx-auto">
-    <header class="mb-10 text-center">
+    <header class="mb-10">
       <h1 class="text-4xl font-black text-slate-900 tracking-tight uppercase italic">
         @if (esAdmin()) { Gestión de <span class="text-blue-600">Materiales</span> }
         @else { Nuestros <span class="text-blue-600">Materiales</span> }
@@ -38,6 +38,23 @@
                 </div>
               </div>
 
+              <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase ml-2 mb-1">Descripción</label>
+                <textarea [(ngModel)]="nuevoMaterial.descripcion" name="descripcion" rows="2"
+                          class="w-full bg-slate-50 rounded-2xl p-4 outline-none text-sm" placeholder="Breve descripción..."></textarea>
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase ml-2 mb-1">Propiedades Mecánicas</label>
+                <textarea [(ngModel)]="nuevoMaterial.propiedades" name="propiedades" rows="2"
+                          class="w-full bg-slate-50 rounded-2xl p-4 outline-none text-sm" placeholder="Resistencia, flexibilidad..."></textarea>
+              </div>
+
+              <div class="flex items-center gap-3 p-2">
+                <input type="checkbox" [(ngModel)]="nuevoMaterial.disponible" name="disponible" id="dispMat" class="w-5 h-5 accent-blue-600">
+                <label for="dispMat" class="text-sm font-bold text-slate-700 uppercase tracking-tighter">Disponible para la venta</label>
+              </div>
+
               <button (click)="guardar()" class="w-full py-4 rounded-2xl font-black uppercase text-xs transition-colors"
                       [ngClass]="editando ? 'bg-blue-600 text-white' : 'bg-slate-900 text-white hover:bg-blue-600'">
                 {{ editando ? 'Actualizar Cambios' : 'Guardar Material' }}
@@ -66,22 +83,69 @@
             </thead>
             <tbody class="divide-y divide-slate-50">
               @for (m of materiales(); track m.id) {
-                <tr class="hover:bg-blue-50/30 transition-colors group">
-                  <td class="px-8 py-5 font-bold text-slate-800">{{ m.nombreMaterial }}</td>
+                <tr (click)="toggleFila(m.id)" class="hover:bg-blue-50/30 transition-colors group cursor-pointer">
+                  <td class="px-8 py-5 font-bold text-slate-800">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-4 h-4 transition-transform text-slate-400"
+                           [class.rotate-90]="idFilaExpandida() === m.id"
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                      {{ m.nombreMaterial }}
+                    </div>
+                  </td>
                   <td class="text-sm text-slate-500">{{ m.tipo }} - {{ m.color }}</td>
                   <td class="font-bold text-blue-600">{{ m.precioPorGramo }}€/g</td>
 
                   @if (esAdmin()) {
                     <td class="text-right px-8 space-x-2">
-                      <button (click)="seleccionarParaEditar(m)" class="p-2 text-slate-400 hover:text-blue-600 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                      <button (click)="$event.stopPropagation(); seleccionarParaEditar(m)" class="p-2 text-slate-400 hover:text-blue-600 transition-colors opacity-0 group-hover:opacity-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                       </button>
-                      <button (click)="borrar(m.id)" class="p-2 text-slate-400 hover:text-red-600 transition-colors">
+                      <button (click)="$event.stopPropagation(); borrar(m.id)" class="p-2 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                       </button>
                     </td>
                   }
                 </tr>
+
+                @if (idFilaExpandida() === m.id) {
+                  <tr class="bg-slate-50/50">
+                    <td colspan="4" class="px-8 py-6">
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fadeIn">
+
+                        <div>
+                          <h4 class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Descripción Completa</h4>
+                          <p class="text-sm text-slate-600 leading-relaxed">{{ m.descripcion || 'Sin descripción disponible.' }}</p>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                          <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Ficha Técnica</h4>
+                          <div class="space-y-2">
+                            <div class="flex justify-between text-xs">
+                              <span class="text-slate-400 font-bold uppercase">Stock Actual:</span>
+                              <span class="font-mono font-bold text-slate-700">{{ m.stockGramo }}g</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                              <span class="text-slate-400 font-bold uppercase">Estado:</span>
+                              <span [class]="m.disponible ? 'text-green-600' : 'text-red-600'" class="font-bold">
+                {{ m.disponible ? 'Disponible' : 'No disponible' }}
+              </span>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-slate-50">
+                              <span class="text-[10px] font-black text-slate-400 uppercase">Propiedades:</span>
+                              <p class="text-xs text-slate-500 mt-1 italic">{{ m.propiedades || 'No especificadas' }}</p>
+                            </div>
+                            <div class="text-[10px] text-slate-300 mt-2 text-right">
+                              Creado el: {{ m.fechaCreacion | date:'dd/MM/yyyy' }}
+                            </div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </td>
+                  </tr>
+                }
               }
             </tbody>
           </table>

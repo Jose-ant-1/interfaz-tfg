@@ -9,9 +9,18 @@
     <div class="flex items-center gap-4">
       <a routerLink="/productos" class="text-slate-300 hover:text-white font-medium">Productos</a>
 
+      @if (!esAdmin()) {
+        <a routerLink="/pedido-personalizado"
+           class="text-slate-300 hover:text-blue-500 font-medium">
+          Pedido Personalizado
+        </a>
+      }
+
       <a routerLink="/materiales" class="text-slate-300 hover:text-white font-medium">Materiales</a>
 
       <a routerLink="/tecnologias" class="text-slate-300 hover:text-white font-medium">Tecnologías</a>
+
+
 
       @if (authService.currentUser()) {
         @if (!esAdmin()) {

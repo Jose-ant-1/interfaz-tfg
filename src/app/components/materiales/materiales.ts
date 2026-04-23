@@ -9,13 +9,14 @@ import { Material } from '../../models/configuracion.model';
   selector: 'app-admin-materiales',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './materiales.html'
+  templateUrl: './materiales.html',
 })
 export class AdminMaterialesComponent implements OnInit {
   private configService = inject(AdminConfigService);
   public authService = inject(AuthService);
 
   materiales = signal<Material[]>([]);
+  idFilaExpandida = signal<number | null>(null);
 
   // Objeto para el formulario
   nuevoMaterial: Material = this.resetForm();
@@ -29,8 +30,13 @@ export class AdminMaterialesComponent implements OnInit {
     this.cargarMateriales();
   }
 
+  toggleFila(id: number | undefined) {
+    if (!id) return;
+    this.idFilaExpandida.set(this.idFilaExpandida() === id ? null : id);
+  }
+
   cargarMateriales() {
-    this.configService.getMateriales().subscribe(res => this.materiales.set(res));
+    this.configService.getMateriales().subscribe((res) => this.materiales.set(res));
   }
 
   // Carga un material en el formulario para editarlo
@@ -49,7 +55,7 @@ export class AdminMaterialesComponent implements OnInit {
   guardar() {
     // Validamos que los números sean efectivamente números
     if (!this.nuevoMaterial.nombreMaterial || this.nuevoMaterial.precioPorGramo < 0) {
-      alert("Revisa los datos obligatorios");
+      alert('Revisa los datos obligatorios');
       return;
     }
 
@@ -58,18 +64,24 @@ export class AdminMaterialesComponent implements OnInit {
       ...this.nuevoMaterial,
       // Forzamos que sean números por si el input los dejó como string
       precioPorGramo: Number(this.nuevoMaterial.precioPorGramo),
-      stockGramo: Number(this.nuevoMaterial.stockGramo)
+      stockGramo: Number(this.nuevoMaterial.stockGramo),
     };
 
     if (this.editando && this.nuevoMaterial.id) {
       this.configService.updateMaterial(this.nuevoMaterial.id, datosAEnviar).subscribe({
-        next: () => { this.cargarMateriales(); this.cancelarEdicion(); },
-        error: (err) => console.error("Error 400 - Verifica los campos:", err)
+        next: () => {
+          this.cargarMateriales();
+          this.cancelarEdicion();
+        },
+        error: (err) => console.error('Error 400 - Verifica los campos:', err),
       });
     } else {
       this.configService.saveMaterial(datosAEnviar).subscribe({
-        next: () => { this.cargarMateriales(); this.nuevoMaterial = this.resetForm(); },
-        error: (err) => console.error("Error 400 - Verifica los campos:", err)
+        next: () => {
+          this.cargarMateriales();
+          this.nuevoMaterial = this.resetForm();
+        },
+        error: (err) => console.error('Error 400 - Verifica los campos:', err),
       });
     }
   }
@@ -77,7 +89,7 @@ export class AdminMaterialesComponent implements OnInit {
   borrar(id: number | undefined) {
     if (!id || !confirm('¿Estás seguro de que deseas eliminar este material?')) return;
     this.configService.deleteMaterial(id).subscribe(() => {
-      this.materiales.update(list => list.filter(m => m.id !== id));
+      this.materiales.update((list) => list.filter((m) => m.id !== id));
     });
   }
 
@@ -90,9 +102,8 @@ export class AdminMaterialesComponent implements OnInit {
       color: '',
       precioPorGramo: 0,
       stockGramo: 0,
-      propiedades: '', // Inicializar
-      imagen: '',      // Inicializar
-      disponible: true
+      propiedades: '',
+      disponible: true, // Por defecto disponible
     };
   }
 }
