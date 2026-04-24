@@ -15,11 +15,11 @@ export class CarritoService {
   public items = this._items.asReadonly();
 
   public totalProductos = computed(() =>
-    this._items().reduce((acc, item) => acc + item.cantidad, 0)
+    this._items().reduce((acc, item) => acc + item.cantidad, 0),
   );
 
   public precioTotal = computed(() =>
-    this._items().reduce((acc, item) => acc + (item.precio * item.cantidad), 0)
+    this._items().reduce((acc, item) => acc + item.precio * item.cantidad, 0),
   );
 
   constructor() {
@@ -33,7 +33,7 @@ export class CarritoService {
     effect(() => {
       const usuario = this.authService.currentUser();
       if (usuario) {
-        console.log("Detectado usuario logueado, cargando carrito del servidor...");
+        console.log('Detectado usuario logueado, cargando carrito del servidor...');
         this.cargarCarritoDesdeServidor();
       }
     });
@@ -47,11 +47,10 @@ export class CarritoService {
       const pId = producto.productoId || producto.id;
 
       // Tu endpoint de Spring /api/carrito/add/{id}?cantidad=X
-      this.http.post(`${this.API_URL}/add/${pId}?cantidad=${cantidadSolicitada}`, {})
-        .subscribe({
-          next: () => this.cargarCarritoDesdeServidor(),
-          error: (err) => console.error("Error al sincronizar cantidad:", err)
-        });
+      this.http.post(`${this.API_URL}/add/${pId}?cantidad=${cantidadSolicitada}`, {}).subscribe({
+        next: () => this.cargarCarritoDesdeServidor(),
+        error: (err) => console.error('Error al sincronizar cantidad:', err),
+      });
     } else {
       // Si es anónimo, la lógica de localStorage (que ya deberías tener)
       this.actualizarEstadoLocal(producto, cantidadSolicitada);
@@ -60,7 +59,7 @@ export class CarritoService {
 
   decrementarProducto(id: number) {
     const usuario = this.authService.currentUser();
-    const item = this._items().find(i => i.id === id);
+    const item = this._items().find((i) => i.id === id);
     if (!item) return;
 
     if (usuario) {
@@ -79,9 +78,9 @@ export class CarritoService {
   }
 
   private actualizarEstadoLocal(producto: any, cambio: number) {
-    this._items.update(items => {
+    this._items.update((items) => {
       const pId = producto.productoId || producto.id;
-      const index = items.findIndex(i => (i.productoId || i.id) === pId);
+      const index = items.findIndex((i) => (i.productoId || i.id) === pId);
       let nuevoCarrito;
 
       if (index !== -1) {
@@ -94,14 +93,17 @@ export class CarritoService {
           nuevoCarrito[index] = { ...nuevoCarrito[index], cantidad: nuevaCantidad };
         }
       } else if (cambio > 0) {
-        nuevoCarrito = [...items, {
-          id: pId,
-          productoId: pId,
-          nombre: producto.nombreProducto || producto.nombre,
-          precio: producto.precio,
-          cantidad: 1,
-          imagenUrl: producto.imagenUrl
-        }];
+        nuevoCarrito = [
+          ...items,
+          {
+            id: pId,
+            productoId: pId,
+            nombre: producto.nombreProducto || producto.nombre,
+            precio: producto.precio,
+            cantidad: 1,
+            imagenUrl: producto.imagenUrl,
+          },
+        ];
       } else {
         return items;
       }
@@ -123,13 +125,13 @@ export class CarritoService {
             nombre: e.producto?.nombreProducto || 'Producto',
             precio: e.precioUnitario,
             cantidad: e.cantidad,
-            imagenUrl: e.producto?.imagenUrl || 'assets/placeholder.png'
+            imagenUrl: e.producto?.imagenUrl || 'assets/placeholder.png',
           }));
           this._items.set(itemsMapeados);
           // Opcional: mantener sincronizado el local incluso logueado
           localStorage.setItem('carrito_local', JSON.stringify(itemsMapeados));
         }
-      }
+      },
     });
   }
 
@@ -137,11 +139,11 @@ export class CarritoService {
     const usuario = this.authService.currentUser();
     if (usuario) {
       this.http.delete(`${this.API_URL}/item/${id}`).subscribe({
-        next: () => this.cargarCarritoDesdeServidor()
+        next: () => this.cargarCarritoDesdeServidor(),
       });
     } else {
-      this._items.update(items => {
-        const nuevo = items.filter(i => i.id !== id);
+      this._items.update((items) => {
+        const nuevo = items.filter((i) => i.id !== id);
         localStorage.setItem('carrito_local', JSON.stringify(nuevo));
         return nuevo;
       });
@@ -152,4 +154,8 @@ export class CarritoService {
     this._items.set([]);
   }
 
+  limpiarCarrito() {
+    this._items.set([]);
+    localStorage.removeItem('carrito_local');
+  }
 }

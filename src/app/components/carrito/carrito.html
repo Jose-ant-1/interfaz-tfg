@@ -9,7 +9,8 @@
             @for (item of items(); track item.id) {
               <li class="py-6 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                  <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden border border-slate-50 shadow-sm shrink-0">
+                  <div
+                    class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden border border-slate-50 shadow-sm shrink-0">
                     @if (item.imagenUrl) {
                       <img [src]="item.imagenUrl"
                            [alt]="item.nombre"
@@ -52,16 +53,20 @@
               <p class="text-4xl font-black text-blue-600">{{ carritoService.precioTotal() | currency:'EUR' }}</p>
             </div>
 
-            <button class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-lg shadow-blue-200">
-              Tramitar Pedido
+            <button
+              routerLink="/pago"
+              class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-lg shadow-blue-200">
+              Proceder al pago
             </button>
           </div>
         </div>
       </div>
     } @else {
       <div class="text-center py-20 bg-white rounded-[2rem] border border-dashed border-slate-300">
-        <p class="text-slate-400 text-lg font-medium">Tu carrito está tan vacío como una placa de impresión sin nivelar.</p>
-        <button routerLink="/productos" class="mt-6 text-blue-600 font-bold hover:underline">Ir a buscar piezas 3D</button>
+        <p class="text-slate-400 text-lg font-medium">Tu carrito está tan vacío como una placa de impresión sin
+          nivelar.</p>
+        <button routerLink="/productos" class="mt-6 text-blue-600 font-bold hover:underline">Ir a buscar piezas 3D
+        </button>
       </div>
     }
   </div>

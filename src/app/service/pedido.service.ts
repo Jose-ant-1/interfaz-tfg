@@ -4,7 +4,7 @@ import { Pedido } from '../models/pedido.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PedidoService {
   private http = inject(HttpClient);
@@ -14,7 +14,7 @@ export class PedidoService {
 
   // Obtener todos (Solo Admin)
   obtenerTodos(): void {
-    this.http.get<Pedido[]>(this.apiUrl).subscribe(data => {
+    this.http.get<Pedido[]>(this.apiUrl).subscribe((data) => {
       this.pedidos.set(data);
     });
   }
@@ -31,5 +31,9 @@ export class PedidoService {
 
   actualizarEstado(id: number, nuevoEstado: string) {
     return this.http.patch(`${this.apiUrl}/${id}/estado`, { estado: nuevoEstado });
+  }
+
+  crearPedido(pedido: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, pedido);
   }
 }
