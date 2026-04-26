@@ -1,8 +1,8 @@
 export interface Pago {
   id?: number;
-  idUsuario: number;
-  idPedido?: number;
-  idSolicitud?: number;
+  usuario?: { id: number  };
+  pedido?: {idPedido: number};
+  solicitud?: {id: number};
   importe: number;
   metodoPago: string; // 'TARJETA', 'PAYPAL', etc.
   estadoPago: string; // 'COMPLETADO', 'PENDIENTE'

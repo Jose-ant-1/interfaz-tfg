@@ -57,23 +57,21 @@ export class CarritoService {
     }
   }
 
-  decrementarProducto(id: number) {
+  decrementarProducto(idProducto: number) {
     const usuario = this.authService.currentUser();
-    const item = this._items().find((i) => i.id === id);
-    if (!item) return;
 
     if (usuario) {
-      // MODO LOGUEADO: Si cantidad es 1, podrías llamar a eliminarItem, si no, a un "remove/1"
-      // Como no tienes endpoint de restar 1 específicamente, usamos lógica local o podrías implementar el delete
-      if (item.cantidad <= 1) {
-        this.quitarProducto(id);
-      } else {
-        // Aquí podrías llamar al back si tuvieras un endpoint de decremento
-        this.actualizarEstadoLocal(item, -1);
+      if (!idProducto) {
+        console.error("Error: Se intentó restar un producto sin ID válido");
+        return;
       }
+
+      this.http.post(`${this.API_URL}/add/${idProducto}?cantidad=-1`, {}).subscribe({
+        next: () => this.cargarCarritoDesdeServidor(),
+        error: (err) => console.error('Error al restar producto:', err),
+      });
     } else {
-      // MODO ANÓNIMO
-      this.actualizarEstadoLocal(item, -1);
+      // ... tu lógica de localStorage actual ...
     }
   }
 

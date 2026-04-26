@@ -1,24 +1,30 @@
 <div class="min-h-screen bg-slate-50 p-6 md:p-12">
   <div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-black text-slate-900 uppercase italic mb-8">Finalizar <span class="text-blue-600">Compra</span></h1>
+    <h1 class="text-3xl font-black text-slate-900 uppercase italic mb-8">
+      Finalizar <span class="text-blue-600">Compra</span>
+    </h1>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <div class="space-y-6">
         <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
           <h2 class="text-xl font-bold mb-6 text-slate-800">Datos de Envío</h2>
           <div class="space-y-4">
-            <input type="text" [(ngModel)]="datosEnvio.direccion" placeholder="Dirección completa" class="w-full bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500">
-            <textarea [(ngModel)]="datosEnvio.nota" placeholder="Notas para el repartidor (opcional)" class="w-full bg-slate-50 p-4 rounded-2xl outline-none h-24"></textarea>
+            <input type="text" [(ngModel)]="datosEnvio.direccion" placeholder="Dirección completa"
+                   class="w-full bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 border border-transparent focus:border-blue-500 transition-all">
+            <textarea [(ngModel)]="datosEnvio.nota" placeholder="Notas para el repartidor (opcional)"
+                      class="w-full bg-slate-50 p-4 rounded-2xl outline-none h-24 focus:ring-2 focus:ring-blue-500 border border-transparent focus:border-blue-500 transition-all"></textarea>
           </div>
         </div>
 
         <div class="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-xl">
           <h2 class="text-xl font-bold mb-6">Método de Pago</h2>
           <div class="space-y-4">
-            <input type="text" placeholder="Número de tarjeta" class="w-full bg-slate-800 p-4 rounded-2xl outline-none border border-slate-700">
-            <div class="grid grid-cols-2 gap-4">
-              <input type="text" placeholder="MM/YY" class="bg-slate-800 p-4 rounded-2xl outline-none border border-slate-700">
-              <input type="text" placeholder="CVC" class="bg-slate-800 p-4 rounded-2xl outline-none border border-slate-700">
+            <div class="space-y-3">
+              <input type="text" placeholder="0000 0000 0000 0000" class="w-full bg-slate-800 p-4 rounded-2xl outline-none border border-slate-700 focus:border-blue-500">
+              <div class="grid grid-cols-2 gap-4">
+                <input type="text" placeholder="MM/YY" class="bg-slate-800 p-4 rounded-2xl outline-none border border-slate-700 focus:border-blue-500">
+                <input type="text" placeholder="CVC" class="bg-slate-800 p-4 rounded-2xl outline-none border border-slate-700 focus:border-blue-500">
+              </div>
             </div>
           </div>
         </div>
@@ -26,25 +32,30 @@
 
       <div class="lg:col-span-1">
         <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 sticky top-8">
-          <h2 class="text-xl font-bold mb-6 text-slate-800">Resumen</h2>
+          <h2 class="text-xl font-bold mb-6 text-slate-800">Resumen del Pedido</h2>
           <div class="space-y-3 mb-6">
             @for (item of carritoItems(); track item.id) {
               <div class="flex justify-between text-sm">
-                <span class="text-slate-500">{{item.cantidad}}x {{item.nombre}}</span>
-                <span class="font-bold">{{item.precio * item.cantidad | currency:'EUR'}}</span>
+                <span class="text-slate-600">{{item.cantidad}}x {{item.nombre}}</span>
+                <span class="font-bold text-slate-900">{{item.precio * item.cantidad | currency:'EUR'}}</span>
               </div>
             }
           </div>
+
           <hr class="border-slate-100 mb-4">
+
           <div class="flex justify-between text-xl font-black text-slate-900 uppercase">
             <span>Total</span>
-            <span>{{totalCarrito() | currency:'EUR'}}</span>
+            <span class="text-blue-600">{{totalCarrito() | currency:'EUR'}}</span>
           </div>
 
           <button (click)="realizarPago()"
-                  [disabled]="cargando()"
-                  class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-2xl transition-all transform active:scale-95 shadow-lg shadow-blue-200">
-            {{ cargando() ? 'PROCESANDO...' : 'CONFIRMAR Y PAGAR' }}
+
+                  class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed">
+            Pagar
+            @if (cargando()) {
+              Procesando...
+            }
           </button>
         </div>
       </div>

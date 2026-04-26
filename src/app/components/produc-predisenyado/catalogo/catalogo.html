@@ -43,8 +43,15 @@
 
               @if (!esAdmin()) {
                 <button (click)="$event.stopPropagation(); agregarAlCarrito(producto)"
-                        class="col-span-4 bg-slate-900 text-white px-4 py-4 rounded-2xl hover:bg-blue-600 transition-all font-black uppercase text-sm tracking-tighter active:scale-95">
-                  Añadir al Carrito
+                        [disabled]="producto.stockDisponible <= 0"
+                        class="col-span-4 bg-slate-900 text-white px-4 py-4 rounded-2xl hover:bg-blue-600 transition-all font-black uppercase text-sm tracking-tighter active:scale-95 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed disabled:hover:bg-slate-300">
+
+                  @if (producto.stockDisponible > 0) {
+                    Añadir al Carrito
+                  } @else {
+                    Sin Existencias
+                  }
+
                 </button>
               }
 

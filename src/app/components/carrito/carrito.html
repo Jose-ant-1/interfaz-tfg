@@ -1,6 +1,19 @@
 <div class="min-h-screen bg-slate-50 p-8">
   <div class="max-w-4xl mx-auto">
     <h1 class="text-3xl font-black text-slate-900 mb-8 uppercase tracking-tighter">Tu Carrito</h1>
+    @if (erroresStock().length > 0) {
+      <div class="mb-6 p-4 bg-red-100 text-red-800 rounded-2xl border border-red-200">
+        <div class="flex items-center mb-2">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          <span class="font-bold">Revisa tu pedido:</span>
+        </div>
+        <ul class="list-disc pl-6 space-y-1 text-sm">
+          @for (error of erroresStock(); track $index) {
+            <li>{{ error }}</li>
+          }
+        </ul>
+      </div>
+    }
 
     @if (items().length > 0) {
       <div class="bg-white rounded-[2rem] shadow-xl border border-slate-100 overflow-hidden">
@@ -27,7 +40,7 @@
                 </div>
 
                 <div class="flex items-center bg-slate-100 rounded-lg p-1 gap-1">
-                  <button (click)="reducir(item.id)"
+                  <button (click)="reducir(item)"
                           class="bg-white p-1.5 rounded shadow-sm hover:text-red-500 transition-colors active:scale-90">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
@@ -54,9 +67,15 @@
             </div>
 
             <button
-              routerLink="/pago"
-              class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-lg shadow-blue-200">
-              Proceder al pago
+              (click)="procederAlPago()"
+              [disabled]="cargandoPago()"
+              class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-lg shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+
+              @if (cargandoPago()) {
+                <span class="animate-spin text-xl">⏳</span> Comprobando stock...
+              } @else {
+                Proceder al pago
+              }
             </button>
           </div>
         </div>
