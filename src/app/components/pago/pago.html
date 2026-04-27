@@ -10,21 +10,49 @@
           <h2 class="text-xl font-bold mb-6 text-slate-800">Datos de Envío</h2>
           <div class="space-y-4">
             <input type="text" [(ngModel)]="datosEnvio.direccion" placeholder="Dirección completa"
-                   class="w-full bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 border border-transparent focus:border-blue-500 transition-all">
+                   class="w-full bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 border border-transparent focus:border-blue-500 transition-all font-medium">
             <textarea [(ngModel)]="datosEnvio.nota" placeholder="Notas para el repartidor (opcional)"
-                      class="w-full bg-slate-50 p-4 rounded-2xl outline-none h-24 focus:ring-2 focus:ring-blue-500 border border-transparent focus:border-blue-500 transition-all"></textarea>
+                      class="w-full bg-slate-50 p-4 rounded-2xl outline-none h-24 focus:ring-2 focus:ring-blue-500 border border-transparent focus:border-blue-500 transition-all font-medium"></textarea>
           </div>
         </div>
 
-        <div class="bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-xl">
-          <h2 class="text-xl font-bold mb-6">Método de Pago</h2>
-          <div class="space-y-4">
-            <div class="space-y-3">
-              <input type="text" placeholder="0000 0000 0000 0000" class="w-full bg-slate-800 p-4 rounded-2xl outline-none border border-slate-700 focus:border-blue-500">
-              <div class="grid grid-cols-2 gap-4">
-                <input type="text" placeholder="MM/YY" class="bg-slate-800 p-4 rounded-2xl outline-none border border-slate-700 focus:border-blue-500">
-                <input type="text" placeholder="CVC" class="bg-slate-800 p-4 rounded-2xl outline-none border border-slate-700 focus:border-blue-500">
-              </div>
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
+          <h2 class="text-xl font-bold mb-6 text-slate-800">Método de Pago</h2>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-2">
+              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Número de Tarjeta</label>
+              <input type="text"
+                     [ngModel]="numeroTarjeta()"
+                     (input)="onNumeroTarjetaInput($event)"
+                     placeholder="0000 0000 0000 0000"
+                     maxlength="19"
+                     class="w-full bg-slate-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-blue-500 focus:ring-0 outline-none transition-all font-semibold text-slate-700">
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Expira (MM/YY)</label>
+              <input type="text"
+                     [ngModel]="fechaExpiracion()"
+                     (input)="onFechaInput($event)"
+                     placeholder="MM/YY"
+                     maxlength="5"
+                     [class.border-red-500]="fechaExpiracion().length === 5 && !isFechaValida()"
+                     class="w-full bg-slate-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-blue-500 focus:ring-0 outline-none transition-all font-semibold text-slate-700">
+
+              @if (fechaExpiracion().length === 5 && !isFechaValida()) {
+                <p class="text-[9px] text-red-500 font-bold mt-1 ml-2 uppercase">Tarjeta caducada</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">CVC</label>
+              <input type="text"
+                     [ngModel]="cvc()"
+                     (ngModelChange)="cvc.set($event.replace('/D/g', '').substring(0,3))"
+                     placeholder="123"
+                     maxlength="3"
+                     class="w-full bg-slate-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-blue-500 focus:ring-0 outline-none transition-all font-semibold text-slate-700">
             </div>
           </div>
         </div>
@@ -36,7 +64,7 @@
           <div class="space-y-3 mb-6">
             @for (item of carritoItems(); track item.id) {
               <div class="flex justify-between text-sm">
-                <span class="text-slate-600">{{item.cantidad}}x {{item.nombre}}</span>
+                <span class="text-slate-600 font-medium">{{item.cantidad}}x {{item.nombre}}</span>
                 <span class="font-bold text-slate-900">{{item.precio * item.cantidad | currency:'EUR'}}</span>
               </div>
             }
@@ -50,11 +78,12 @@
           </div>
 
           <button (click)="realizarPago()"
-
-                  class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed">
-            Pagar
+                  [disabled]="cargando()"
+                  class="w-full mt-8 bg-slate-900 hover:bg-blue-600 text-white font-black uppercase tracking-widest py-5 rounded-2xl transition-all shadow-xl active:scale-95 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed">
             @if (cargando()) {
-              Procesando...
+              <span>Procesando...</span>
+            } @else {
+              <span>Confirmar Pago</span>
             }
           </button>
         </div>

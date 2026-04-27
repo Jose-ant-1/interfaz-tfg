@@ -18,6 +18,58 @@ export class PagoComponent {
   private pedidoService = inject(PedidoService);
   private router = inject(Router);
 
+  // Señales para el formulario
+  direccion = signal('');
+  notas = signal('');
+
+  // Datos de tarjeta
+  numeroTarjeta = signal('');
+  fechaExpiracion = signal(''); // Formato MM/YY
+  cvc = signal('');
+
+  // Formatear número de tarjeta: Bloques de 4
+  onNumeroTarjetaInput(event: any) {
+    let val = event.target.value.replace(/\D/g, ''); // Solo números
+    if (val.length > 16) val = val.substring(0, 16);
+
+    // Agrupar de 4 en 4
+    const blocks = val.match(/.{1,4}/g);
+    this.numeroTarjeta.set(blocks ? blocks.join(' ') : val);
+  }
+
+  // Formatear Fecha MM/YY
+  onFechaInput(event: any) {
+    let val = event.target.value.replace(/\D/g, '');
+    if (val.length > 4) val = val.substring(0, 4);
+
+    if (val.length >= 2) {
+      val = val.substring(0, 2) + '/' + val.substring(2);
+    }
+    this.fechaExpiracion.set(val);
+  }
+
+  // Validar si la fecha es futura
+  isFechaValida(): boolean {
+    const fecha = this.fechaExpiracion();
+    if (!fecha || !fecha.includes('/')) return false;
+
+    const [month, yearStr] = fecha.split('/').map(Number);
+    if (!month || !yearStr || month > 12 || month < 1) return false;
+
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1; // getMonth() va de 0 a 11
+    // Obtenemos los últimos 2 dígitos del año actual (ej: 2024 -> 24)
+    const currentYear = parseInt(now.getFullYear().toString().slice(-2));
+
+    // Si el año es menor al actual, no es válida
+    if (yearStr < currentYear) return false;
+
+    // Si es el mismo año pero el mes ya pasó o es el actual (dependiendo de tu política,
+    // normalmente las tarjetas valen hasta el último día del mes impreso)
+    return !(yearStr === currentYear && month < currentMonth);
+
+  }
+
   carritoItems = this.carritoService.items;
   totalCarrito = this.carritoService.precioTotal;
   cargando = signal(false);
@@ -27,6 +79,31 @@ export class PagoComponent {
 
   async realizarPago() {
     // Si hay errores de stock, no permitimos continuar
+
+    // Validar Dirección
+    if (!this.datosEnvio.direccion) {
+      alert('Por favor, introduce una dirección de envío.');
+      return;
+    }
+
+    // Validar Número de Tarjeta (16 dígitos sin contar espacios)
+    const numLimpio = this.numeroTarjeta().replace(/\s/g, '');
+    if (numLimpio.length !== 16) {
+      alert('El número de tarjeta debe tener 16 dígitos.');
+      return;
+    }
+
+    // Validar Fecha de Expiración (LA CLAVE DE TU PREGUNTA)
+    if (!this.isFechaValida()) {
+      alert('La tarjeta está caducada o la fecha no es válida (Formato: MM/YY).');
+      return;
+    }
+
+    // Validar CVC
+    if (this.cvc().length < 3) {
+      alert('El código CVC debe tener 3 dígitos.');
+      return;
+    }
 
     if (!this.datosEnvio.direccion) {
       alert('Por favor, introduce una dirección de envío.');
