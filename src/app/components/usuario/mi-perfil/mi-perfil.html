@@ -1,0 +1,151 @@
+<div class="min-h-screen bg-slate-50 p-4 md:p-12">
+  <div class="max-w-4xl mx-auto">
+
+    @if (usuario()) {
+      <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-8 mb-8 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-50 rounded-full opacity-50"></div>
+
+        <div class="z-10 text-center md:text-left">
+          <h1 class="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">Mi Perfil</h1>
+          <p class="text-slate-500 font-medium">Gestiona tu información personal y direcciones</p>
+        </div>
+      </div>
+
+      <form (ngSubmit)="actualizarPerfil()" #perfilForm="ngForm" class="space-y-8">
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+          <div class="lg:col-span-1 space-y-6">
+            <div class="bg-slate-900 rounded-[2rem] p-8 text-white shadow-lg">
+              <h2 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6">Datos de Acceso</h2>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Email Registrado</label>
+                  <p class="font-medium text-blue-400 break-all">{{ usuario()?.email }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-blue-600 rounded-[2rem] p-8 text-white shadow-lg shadow-blue-200">
+              <p class="text-sm font-bold opacity-90">¿Necesitas ayuda?</p>
+              <p class="text-xs mt-2 opacity-80 leading-relaxed">Si necesitas cambiar tu email o eliminar tu cuenta, contacta con soporte.</p>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 space-y-6">
+
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8">
+              <h3 class="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
+                <span class="w-2 h-6 bg-blue-600 rounded-full"></span>
+                Información Personal
+              </h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2">Nombre</label>
+                  <input type="text" [(ngModel)]="usuario()!.nombre" name="nombre" required #nombre="ngModel"
+                         class="w-full bg-slate-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-blue-500 focus:ring-0 outline-none transition-all font-semibold">
+                  @if (nombre.invalid && nombre.touched) {
+                    <p class="text-[10px] text-red-500 mt-1 ml-2 font-bold uppercase">El nombre es obligatorio</p>
+                  }
+                </div>
+                <div>
+                  <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2">Apellidos</label>
+                  <input type="text" [(ngModel)]="usuario()!.apellidos" name="apellidos" required #apellidos="ngModel"
+                         class="w-full bg-slate-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-blue-500 focus:ring-0 outline-none transition-all font-semibold">
+                  @if (apellidos.invalid && apellidos.touched) {
+                    <p class="text-[10px] text-red-500 mt-1 ml-2 font-bold uppercase">Los apellidos son obligatorios</p>
+                  }
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2">Teléfono de Contacto</label>
+                  <input type="tel" [(ngModel)]="usuario()!.telefono" name="tel" required #tel="ngModel" pattern="[0-9]{9}"
+                         class="w-full bg-slate-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-blue-500 focus:ring-0 outline-none transition-all font-semibold"
+                         placeholder="Ej: 600123456">
+                  @if (tel.invalid && tel.touched) {
+                    <p class="text-[10px] text-red-500 mt-1 ml-2 font-bold uppercase italic">Introduce un teléfono válido (9 dígitos)</p>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8">
+              <h3 class="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
+                <span class="w-2 h-6 bg-purple-600 rounded-full"></span>
+                Dirección de Envío
+              </h3>
+
+              <div class="space-y-6">
+                <div>
+                  <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2">Dirección Completa</label>
+                  <input type="text" [(ngModel)]="usuario()!.direccion" name="dir" required #dir="ngModel"
+                         class="w-full bg-slate-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-purple-500 focus:ring-0 outline-none transition-all font-semibold">
+                  @if (dir.invalid && dir.touched) {
+                    <p class="text-[10px] text-purple-600 mt-1 ml-2 font-bold uppercase">La dirección es necesaria para los envíos</p>
+                  }
+                </div>
+                <div class="grid grid-cols-2 gap-6">
+                  <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2">Ciudad</label>
+                    <input type="text" [(ngModel)]="usuario()!.ciudad" name="ciudad" required #ciudad="ngModel"
+                           class="w-full bg-slate-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-purple-500 focus:ring-0 outline-none transition-all font-semibold">
+                    @if (ciudad.invalid && ciudad.touched) {
+                      <p class="text-[10px] text-purple-600 mt-1 ml-2 font-bold uppercase">Campo obligatorio</p>
+                    }
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2">Código Postal</label>
+                    <input type="number" [(ngModel)]="usuario()!.codigoPostal" name="cp" required #cp="ngModel"
+                           class="w-full bg-slate-50 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-purple-500 focus:ring-0 outline-none transition-all font-semibold">
+                    @if (cp.invalid && cp.touched) {
+                      <p class="text-[10px] text-purple-600 mt-1 ml-2 font-bold uppercase">CP obligatorio</p>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-[2rem] shadow-sm border border-red-100 p-8">
+              <h3 class="text-lg font-black text-slate-800 mb-6 flex items-center gap-2">
+                <span class="w-2 h-6 bg-red-500 rounded-full"></span>
+                Seguridad
+              </h3>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2 text-red-500">Nueva Contraseña</label>
+                  <div class="flex gap-4">
+                    <input type="password" [ngModel]="nuevaPassword()" (ngModelChange)="nuevaPassword.set($event)" name="nPass" #pass="ngModel" minlength="6"
+                           class="flex-1 bg-red-50/30 border-2 border-transparent rounded-2xl p-4 focus:bg-white focus:border-red-500 outline-none transition-all font-semibold"
+                           placeholder="Mínimo 6 caracteres">
+
+                    <button type="button" (click)="actualizarPassword()" [disabled]="!nuevaPassword() || pass.invalid"
+                            class="bg-red-500 text-white px-6 rounded-2xl font-black uppercase text-xs hover:bg-slate-900 transition-all disabled:opacity-50">
+                      Cambiar
+                    </button>
+                  </div>
+                  @if (pass.invalid && pass.dirty) {
+                    <p class="text-[10px] text-red-500 mt-2 ml-2 font-bold uppercase italic">La contraseña debe tener al menos 6 caracteres</p>
+                  } @else {
+                    <p class="text-[10px] text-slate-400 mt-2 ml-2 italic">* Al cambiarla, deberás volver a entrar en tu cuenta.</p>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" [disabled]="!perfilForm.form.valid"
+                    class="w-full bg-slate-900 text-white py-6 rounded-[2rem] font-black uppercase tracking-widest shadow-2xl hover:bg-blue-600 disabled:bg-slate-200 disabled:text-slate-400 transition-all active:scale-[0.98]">
+              Actualizar mis datos
+            </button>
+          </div>
+        </div>
+      </form>
+    } @else {
+      <div class="flex flex-col items-center justify-center p-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600"></div>
+        <p class="mt-4 font-bold text-slate-400 uppercase text-xs tracking-widest">Cargando tu perfil...</p>
+      </div>
+    }
+  </div>
+</div>

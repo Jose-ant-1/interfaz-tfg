@@ -9,7 +9,7 @@ import { AuthService } from './auth.service';
 export class CarritoService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-  private readonly API_URL = 'http://localhost:8080/api/carrito';
+  private API_URL = 'http://localhost:8080/api/carrito';
 
   private _items = signal<CarritoModel[]>([]);
   public items = this._items.asReadonly();
@@ -62,7 +62,7 @@ export class CarritoService {
 
     if (usuario) {
       if (!idProducto) {
-        console.error("Error: Se intentó restar un producto sin ID válido");
+        console.error('Error: Se intentó restar un producto sin ID válido');
         return;
       }
 
@@ -133,27 +133,28 @@ export class CarritoService {
     });
   }
 
-  quitarProducto(id: number) {
-    const usuario = this.authService.currentUser();
-    if (usuario) {
-      this.http.delete(`${this.API_URL}/item/${id}`).subscribe({
-        next: () => this.cargarCarritoDesdeServidor(),
-      });
-    } else {
-      this._items.update((items) => {
-        const nuevo = items.filter((i) => i.id !== id);
-        localStorage.setItem('carrito_local', JSON.stringify(nuevo));
-        return nuevo;
-      });
-    }
-  }
-
   limpiarEstadoCapaVisual() {
     this._items.set([]);
   }
 
   limpiarCarrito() {
+    const usuario = this.authService.currentUser();
+
+    // 1. Limpiamos SIEMPRE el rastro local (LocalStorage y Signal)
     this._items.set([]);
     localStorage.removeItem('carrito_local');
+
+    // 2. Si hay un usuario logueado, avisamos al servidor para que limpie la BD
+    if (usuario) {
+      this.http.delete(`${this.API_URL}/limpiar`).subscribe({
+        next: () => {
+          console.log('Servidor: Carrito vaciado con éxito');
+          // No hace falta llamar a cargarCarritoDesdeServidor porque ya pusimos [] arriba
+        },
+        error: (err) => {
+          console.error('Error al limpiar el carrito en el servidor:', err);
+        },
+      });
+    }
   }
 }

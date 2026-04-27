@@ -35,25 +35,33 @@
 
       @if (!esAdmin()) {
         <div routerLink="/carrito" class="relative cursor-pointer px-2">
-          <svg class="w-6 h-6 text-slate-300 hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          <svg class="w-6 h-6 text-slate-300 hover:text-blue-400 transition-colors" fill="none" stroke="currentColor"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
           </svg>
           @if (carritoService.totalProductos() > 0) {
-            <span class="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded-full ring-2 ring-slate-900">{{ carritoService.totalProductos() }}</span>
+            <span
+              class="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded-full ring-2 ring-slate-900">{{ carritoService.totalProductos() }}</span>
           }
         </div>
       }
 
       @if (authService.currentUser()) {
         <div class="flex items-center gap-4 border-l border-slate-700 pl-4 ml-2">
-          <span class="text-slate-400 text-sm font-medium">Hola, <span class="text-white">{{ authService.currentUser()?.nombre }}</span></span>
-          <button (click)="onLogout()" class="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-all">
+          <a routerLink="/mi-perfil"
+             class="text-slate-400 text-sm font-medium hover:text-blue-400 cursor-pointer transition-colors">
+            Hola, <span class="text-white font-bold">{{ authService.currentUser()?.nombre }}</span>
+          </a>
+          <button (click)="onLogout()"
+                  class="bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-all">
             Salir
           </button>
         </div>
       } @else {
         <div class="flex items-center gap-2 border-l border-slate-700 pl-4 ml-2">
-          <button routerLink="/login" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-lg shadow-blue-900/20">
+          <button routerLink="/login"
+                  class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-lg shadow-blue-900/20">
             Iniciar Sesión
           </button>
         </div>

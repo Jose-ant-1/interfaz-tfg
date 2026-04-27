@@ -9,22 +9,24 @@
 
     @if (usuario()) {
       <div class="bg-white rounded-3xl shadow-xl p-8 border border-slate-100">
-        <form (ngSubmit)="guardar()" class="space-y-6">
+        <form #userForm="ngForm" (ngSubmit)="guardar()" class="space-y-6">
 
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-black text-slate-400 uppercase mb-2">Nombre</label>
-              <input type="text" [(ngModel)]="usuario()!.nombre" name="nombre" class="w-full bg-slate-50 rounded-xl p-4 outline-none focus:ring-2 focus:ring-purple-500">
+              <input type="text" [(ngModel)]="usuario()!.nombre" name="nombre" required
+                     class="w-full bg-slate-50 rounded-xl p-4 outline-none focus:ring-2 focus:ring-purple-500">
             </div>
             <div>
               <label class="block text-xs font-black text-slate-400 uppercase mb-2">Apellidos</label>
-              <input type="text" [(ngModel)]="usuario()!.apellidos" name="apellidos" class="w-full bg-slate-50 rounded-xl p-4 outline-none focus:ring-2 focus:ring-purple-500">
+              <input type="text" [(ngModel)]="usuario()!.apellidos" name="apellidos" required
+                     class="w-full bg-slate-50 rounded-xl p-4 outline-none focus:ring-2 focus:ring-purple-500">
             </div>
           </div>
 
           <div>
             <label class="block text-xs font-black text-slate-400 uppercase mb-2">Email</label>
-            <input type="email" [(ngModel)]="usuario()!.email" name="email"
+            <input type="email" [(ngModel)]="usuario()!.email" name="email" required email
                    [disabled]="usuario()?.id !== 0"
                    [class.bg-slate-100]="usuario()?.id !== 0"
                    class="w-full bg-slate-50 rounded-xl p-4 outline-none focus:ring-2 focus:ring-purple-500">
@@ -33,9 +35,9 @@
           @if (usuario()?.id === 0) {
             <div class="bg-green-50 p-4 rounded-xl border border-green-100">
               <label class="block text-xs font-black text-green-700 uppercase mb-2">Contraseña Temporal</label>
-              <input type="password" [(ngModel)]="usuario()!.contrasenia" name="pass"
+              <input type="password" [(ngModel)]="usuario()!.contrasenia" name="pass" required minlength="4"
                      class="w-full bg-white rounded-xl p-4 outline-none focus:ring-2 focus:ring-green-500">
-              <p class="text-[10px] text-green-600 mt-1 italic">* El usuario deberá cambiarla al entrar.</p>
+              <p class="text-[10px] text-green-600 mt-1 italic">* Mínimo 4 caracteres. El usuario deberá cambiarla al entrar.</p>
             </div>
           }
 
@@ -56,7 +58,11 @@
             </div>
           </div>
 
-          <button type="submit" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase shadow-lg hover:bg-purple-600 transition-all">
+          <button type="submit"
+                  [disabled]="userForm.invalid"
+                  [class.opacity-50]="userForm.invalid"
+                  [class.cursor-not-allowed]="userForm.invalid"
+                  class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase shadow-lg hover:bg-purple-600 transition-all">
             {{ usuario()?.id === 0 ? 'Crear Usuario' : 'Guardar Cambios' }}
           </button>
 

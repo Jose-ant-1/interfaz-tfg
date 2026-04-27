@@ -16,6 +16,7 @@ import { CrearProdPredis } from './components/produc-predisenyado/crear-prod-pre
 import { PedidoPersonalizadoComponent } from './components/solicitud-personalizada/solicitud-personalizada';
 import { DetallePedidoComponent } from './components/pedidos/detalle-pedido/detalle-pedido';
 import { PagoComponent } from './components/pago/pago';
+import { MiPerfilComponent } from './components/usuario/mi-perfil/mi-perfil';
 
 export const routes: Routes = [
   // --- RUTAS ABIERTAS (Públicas) ---
@@ -55,6 +56,9 @@ export const routes: Routes = [
 
   // Pago
   { path: 'pago', component: PagoComponent, canActivate: [authGuard] },
+
+  // Mi perfil
+  { path: 'mi-perfil', component: MiPerfilComponent, canActivate: [authGuard] },
 
   // --- REDIRECCIONES Y FALLBACKS ---
   { path: '', redirectTo: 'productos', pathMatch: 'full' },

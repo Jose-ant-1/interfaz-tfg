@@ -1,8 +1,7 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CarritoService } from '../../service/carrito.service';
 import { PagoService } from '../../service/pago.service';
 import { PedidoService } from '../../service/pedido.service';
-import { AuthService } from '../../service/auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CurrencyPipe } from '@angular/common';
@@ -17,7 +16,6 @@ export class PagoComponent {
   private carritoService = inject(CarritoService);
   private pagoService = inject(PagoService);
   private pedidoService = inject(PedidoService);
-  private authService = inject(AuthService);
   private router = inject(Router);
 
   carritoItems = this.carritoService.items;
@@ -26,8 +24,6 @@ export class PagoComponent {
 
   // Señales para controlar el stock
   datosEnvio = { direccion: '', nota: '' };
-
-
 
   async realizarPago() {
     // Si hay errores de stock, no permitimos continuar
@@ -39,21 +35,19 @@ export class PagoComponent {
 
     this.cargando.set(true);
 
-// pago.ts -> dentro de realizarPago()
-
     const totalLimpio = Number(this.totalCarrito().toFixed(2));
 
     const pedidoDTO = {
       total: totalLimpio,
       direccionEnvio: this.datosEnvio.direccion,
       notaCliente: this.datosEnvio.nota,
-      items: this.carritoItems().map(item => ({
+      items: this.carritoItems().map((item) => ({
         // CAMBIO CLAVE: En el DTO de Java se llama 'idProducto', no 'productoId'
         idProducto: item.productoId || item.id,
         cantidad: item.cantidad,
         // Añadimos el precio unitario ya que el DTO lo espera
-        precioUnitario: item.precio
-      }))
+        precioUnitario: item.precio,
+      })),
     };
 
     console.log('Enviando DTO corregido:', pedidoDTO);
@@ -62,7 +56,9 @@ export class PagoComponent {
 
     this.pedidoService.crearPedido(pedidoDTO).subscribe({
       next: (pedidoCreado: any) => {
-        const transaccionId = 'TRANS-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        // Usamos slice para evitar el deprecated substr
+        const randomPart = Math.random().toString(36).slice(2, 11).toUpperCase();
+        const transaccionId = `TRANS-${randomPart}`;
 
         const pagoData = {
           pedido: { idPedido: pedidoCreado.idPedido },
@@ -70,7 +66,7 @@ export class PagoComponent {
           metodoPago: 'TARJETA',
           estadoPago: 'COMPLETADO',
           idTransaccion: transaccionId,
-          detalles: 'Pago realizado con éxito'
+          detalles: 'Pago realizado con éxito',
         };
 
         this.pagoService.procesarPagoSimulado(pagoData).subscribe({
@@ -81,7 +77,7 @@ export class PagoComponent {
           error: (err) => {
             this.cargando.set(false);
             console.error('Error en el pago:', err);
-          }
+          },
         });
       },
       error: (err) => {
@@ -91,7 +87,7 @@ export class PagoComponent {
         if (err.status === 400) {
           alert(err.error?.error || 'Error al procesar el pedido. Verifica el stock.');
         }
-      }
+      },
     });
   }
 }

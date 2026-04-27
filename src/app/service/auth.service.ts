@@ -4,7 +4,7 @@ import {tap} from 'rxjs';
 import {LoginResponse} from '../models/auth.model';
 import {CarritoService} from './carrito.service';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
   private injector = inject(Injector);
@@ -27,7 +27,7 @@ export class AuthService {
 
   login(credentials: { email: string; password: string }) {
     return this.http.post<LoginResponse>(`${this.AUTH_URL}/login`, credentials).pipe(
-      tap(res => {
+      tap((res) => {
         localStorage.setItem('token', res.token);
         localStorage.setItem('user_data', JSON.stringify(res));
 
@@ -36,7 +36,7 @@ export class AuthService {
 
         // Sincronizamos lo que había en local
         this.sincronizarCarritoTrasLogin();
-      })
+      }),
     );
   }
 
@@ -74,10 +74,13 @@ export class AuthService {
     carritoService.limpiarEstadoCapaVisual();
   }
 
-  registro(datos: any) {
-    return this.http.post(`${this.AUTH_URL}/register`, datos, {
-      responseType: 'text' // Ponemos esto porque el servidor devuelve un String, no un JSON
-    });
+  getEmail(): string | null {
+    return this.currentUser()?.email || null;
   }
 
+  registro(datos: any) {
+    return this.http.post(`${this.AUTH_URL}/register`, datos, {
+      responseType: 'text', // Ponemos esto porque el servidor devuelve un String, no un JSON
+    });
+  }
 }

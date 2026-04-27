@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Usuario } from '../models/usuario.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UsuarioService {
   private http = inject(HttpClient);
@@ -12,7 +12,7 @@ export class UsuarioService {
   usuarios = signal<Usuario[]>([]);
 
   obtenerTodos(): void {
-    this.http.get<Usuario[]>(this.apiUrl).subscribe(data => {
+    this.http.get<Usuario[]>(this.apiUrl).subscribe((data) => {
       this.usuarios.set(data);
     });
   }
@@ -29,8 +29,17 @@ export class UsuarioService {
     return this.http.put(`${this.apiUrl}/${id}`, usuario);
   }
 
+  // Dentro de la clase UsuarioService en usuario.service.ts
+  obtenerPorEmail(email: string) {
+    // Asegúrate de que tu backend tenga este endpoint (GET /api/usuarios/email/{email})
+    return this.http.get<Usuario>(`${this.apiUrl}/email/${email}`);
+  }
+
+  cambiarPassword(id: number, nuevaPass: string) {
+    return this.http.put(`${this.apiUrl}/${id}/password`, nuevaPass, { responseType: 'text' });
+  }
+
   crear(usuario: Usuario) {
     return this.http.post(this.apiUrl, usuario);
   }
-
 }

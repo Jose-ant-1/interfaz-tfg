@@ -27,34 +27,33 @@
 
       <div>
         <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Correo Electrónico</label>
-        <input type="email" [(ngModel)]="registroData.email" name="email" required
+        <input type="email" [(ngModel)]="registroData.email" name="email" required email
                class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-semibold text-slate-700"
                placeholder="ejemplo@correo.com">
       </div>
 
       <div>
         <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Contraseña</label>
-        <input type="password" [(ngModel)]="registroData.contrasenia" name="password" required
+        <input type="password" [(ngModel)]="registroData.contrasenia" name="password" required minlength="4"
                class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-semibold text-slate-700"
                placeholder="Mínimo 6 caracteres">
       </div>
 
       <div>
         <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Teléfono</label>
-        <input type="tel" [(ngModel)]="registroData.telefono" name="telefono" required
+        <input type="tel" [(ngModel)]="registroData.telefono" name="telefono" required pattern="[0-9]{9}"
+               #telInput="ngModel"
                class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-semibold text-slate-700"
                placeholder="Ej: 600123456">
+        @if (telInput.invalid && telInput.touched) {
+          <p class="text-[10px] text-red-500 mt-1 ml-2 font-bold uppercase italic">Debe tener 9 dígitos</p>
+        }
       </div>
 
       <button type="submit" [disabled]="!registroForm.form.valid"
               class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-tighter shadow-xl hover:bg-blue-600 disabled:bg-slate-300 disabled:shadow-none transition-all active:scale-95 mt-4">
         Crear mi cuenta
       </button>
-
-      <p class="text-center text-slate-500 text-sm font-medium pt-4">
-        ¿Ya eres miembro?
-        <a routerLink="/login" class="text-blue-600 font-bold hover:underline italic">Inicia sesión</a>
-      </p>
     </form>
   </div>
 </div>
