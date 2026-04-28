@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './components/login/login.component';
+import { Login } from './components/login/login';
 import { RegistroComponent } from './components/usuario/registro/registro';
 import { authGuard } from './guards/auth.guard';
 import { Catalogo } from './components/produc-predisenyado/catalogo/catalogo';
 import { DetalleProductoPredis } from './components/produc-predisenyado/prod.pred.detalle/prod.pred.detalle';
 import { CarritoComponent } from './components/carrito/carrito';
-import { PedidosListaComponent } from './components/pedidos/pedido-lista-component/pedido-lista-component';
+import { PedidosListaComponent } from './components/pedidos/pedido-lista/pedido-lista';
 import { UsuarioListaComponent } from './components/usuario/usuario-lista/usuario-lista';
 import { EditProdPredis } from './components/produc-predisenyado/edit-prod-predis/edit-prod-predis';
 import { EditUsuarioComponent } from './components/usuario/edit-usuario/edit-usuario';
@@ -20,7 +20,7 @@ import { MiPerfilComponent } from './components/usuario/mi-perfil/mi-perfil';
 
 export const routes: Routes = [
   // --- RUTAS ABIERTAS (Públicas) ---
-  { path: 'login', component: LoginComponent },
+  { path: 'login', component: Login },
   { path: 'registro', component: RegistroComponent },
   { path: 'productos', component: Catalogo },
   { path: 'carrito', component: CarritoComponent },

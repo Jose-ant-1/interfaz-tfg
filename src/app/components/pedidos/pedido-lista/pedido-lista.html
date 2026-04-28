@@ -1,0 +1,137 @@
+<div class="min-h-screen bg-slate-50 p-8">
+  <div class="max-w-6xl mx-auto space-y-12">
+
+    <section>
+      <div class="flex items-center gap-4 mb-6">
+        <h2 class="text-2xl font-black text-slate-900 uppercase italic tracking-tight">
+          Pedidos <span class="text-orange-500">Pendientes</span>
+        </h2>
+        <span class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-xs font-black">
+          {{ pedidosPendientes().length }}
+        </span>
+      </div>
+
+      <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-slate-900 text-white text-[10px] uppercase tracking-widest">
+          <tr>
+            <th class="p-6">Nº Pedido</th>
+            <th class="p-6">Cliente</th>
+            <th class="p-6 text-center">Total</th>
+            <th class="p-6 text-center">Estado</th>
+            <th class="p-6 text-right">Acciones</th>
+          </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (p of pedidosPendientes(); track p.idPedido) {
+              <ng-container *ngTemplateOutlet="filaPedido; context: { $implicit: p }"></ng-container>
+            } @empty {
+              <tr><td colspan="5" class="p-12 text-center text-slate-400 font-medium">No hay pedidos pendientes ✨</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="flex items-center gap-4 mb-6">
+        <h2 class="text-2xl font-black text-slate-900 uppercase italic tracking-tight">
+          Historial <span class="text-blue-600">Completados</span>
+        </h2>
+        <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-black">
+          {{ pedidosCompletados().length }}
+        </span>
+      </div>
+
+      <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden opacity-90">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-slate-100 text-slate-500 text-[10px] uppercase tracking-widest">
+          <tr>
+            <th class="p-6">Nº Pedido</th>
+            <th class="p-6">Cliente</th>
+            <th class="p-6 text-center">Total</th>
+            <th class="p-6 text-center">Estado</th>
+            <th class="p-6 text-right">Acciones</th>
+          </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (p of pedidosCompletados(); track p.idPedido) {
+              <ng-container *ngTemplateOutlet="filaPedido; context: { $implicit: p }"></ng-container>
+            } @empty {
+              <tr><td colspan="5" class="p-12 text-center text-slate-400 font-medium">El historial está vacío.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<ng-template #filaPedido let-p>
+  <tr (click)="toggleDetalles(p.idPedido)" class="hover:bg-blue-50/50 transition-all cursor-pointer group">
+    <td class="p-6 font-bold text-slate-700">#{{ p.numeroPedido }}</td>
+    <td class="p-6">
+      <p class="font-bold text-slate-800">{{ p.usuario?.nombre }} {{ p.usuario?.apellidos }}</p>
+      <p class="text-[10px] text-slate-400 font-medium">{{ p.fechaPedido | date:'dd/MM/yyyy' }}</p>
+    </td>
+    <td class="p-6 text-center font-black text-slate-900">{{ p.total | currency:'EUR' }}</td>
+    <td class="p-6 text-center">
+      <span [ngClass]="{
+        'bg-orange-100 text-orange-600': p.estado === 'PENDIENTE',
+        'bg-blue-100 text-blue-600': p.estado === 'EN_PROCESO',
+        'bg-green-100 text-green-600': p.estado === 'COMPLETADO',
+        'bg-red-100 text-red-600': p.estado === 'CANCELADO'
+      }" class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">
+        {{ p.estado }}
+      </span>
+    </td>
+    <td class="p-6 text-right">
+      <div class="flex justify-end gap-2" (click)="$event.stopPropagation()">
+        @if (p.estado === 'PENDIENTE') {
+          <button (click)="cambiarEstado(p.idPedido, 'EN_PROCESO')" class="p-2 hover:bg-blue-100 text-blue-600 rounded-xl transition-all active:scale-90">⚙️</button>
+        }
+        @if (p.estado === 'EN_PROCESO') {
+          <button (click)="cambiarEstado(p.idPedido, 'COMPLETADO')" class="p-2 hover:bg-green-100 text-green-600 rounded-xl transition-all active:scale-90">✅</button>
+        }
+      </div>
+    </td>
+  </tr>
+
+  @if (idPedidoExpandido() === p.idPedido) {
+    <tr>
+      <td colspan="5" class="p-0 bg-slate-50/50">
+        <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 animate-fadeIn">
+          <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+            <h4 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Productos en el pedido</h4>
+            <div class="space-y-3">
+              @for (item of p.items; track item.id) {
+                <div class="flex justify-between items-center border-b border-slate-50 pb-2">
+                  <span class="text-sm font-medium text-slate-700">
+                    <span class="text-blue-500 font-black">{{ item.cantidad }}x</span>
+                    {{ item.producto.nombreProducto }}
+                  </span>
+                  <span class="text-sm font-bold text-slate-900">{{ item.precioUnitario | currency:'EUR' }}</span>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+              <h4 class="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Dirección de Envío</h4>
+              <p class="text-sm text-slate-600 font-medium">{{ p.direccionEnvio }}</p>
+            </div>
+
+            @if (p.notaCliente) {
+              <div class="bg-blue-50 p-6 rounded-[2rem] border border-blue-100">
+                <h4 class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">Nota del Cliente</h4>
+                <p class="text-sm text-blue-800 italic">"{{ p.notaCliente }}"</p>
+              </div>
+            }
+          </div>
+        </div>
+      </td>
+    </tr>
+  }
+</ng-template>

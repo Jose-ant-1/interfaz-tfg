@@ -5,11 +5,11 @@ import {AuthService} from '../../service/auth.service';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html',
+  templateUrl: './login.html',
   imports: [FormsModule, RouterLink],
-  styleUrls: ['./login.component.css'],
+  styleUrls: ['./login.css'],
 })
-export class LoginComponent {
+export class Login {
   email = '';
   password = '';
   errorMessage: string | null = null; // Variable para el mensaje de error

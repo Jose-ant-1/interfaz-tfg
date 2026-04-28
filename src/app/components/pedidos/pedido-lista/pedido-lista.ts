@@ -1,25 +1,37 @@
-import { Component, OnInit, inject, signal } from '@angular/core'; // Añadimos signal
+import { Component, OnInit, inject, signal, computed } from '@angular/core'; // Añadimos computed
 import { PedidoService } from '../../../service/pedido.service';
-import { CurrencyPipe, DatePipe, CommonModule } from '@angular/common'; // Añadimos CommonModule
+import { CurrencyPipe, CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-pedidos-lista',
   standalone: true,
   imports: [CurrencyPipe, CommonModule],
-  templateUrl: './pedido-lista-component.html',
+  templateUrl: './pedido-lista.html',
 })
 export class PedidosListaComponent implements OnInit {
   public pedidoService = inject(PedidoService);
 
-  // Signal para controlar qué fila está abierta
   idPedidoExpandido = signal<number | null>(null);
+
+  // Filtrar pedidos pendientes o en proceso
+  pedidosPendientes = computed(() =>
+    this.pedidoService
+      .pedidos()
+      .filter((p) => p.estado === 'PENDIENTE' || p.estado === 'EN_PROCESO'),
+  );
+
+  // Filtrar pedidos terminados/enviados
+  pedidosCompletados = computed(() =>
+    this.pedidoService
+      .pedidos()
+      .filter((p) => p.estado === 'COMPLETADO' || p.estado === 'CANCELADO'),
+  );
 
   ngOnInit() {
     this.pedidoService.obtenerTodos();
   }
 
   toggleDetalles(id: number) {
-    // Si ya está abierto, lo cerramos (null), si no, abrimos el nuevo ID
     this.idPedidoExpandido.update((current) => (current === id ? null : id));
   }
 
