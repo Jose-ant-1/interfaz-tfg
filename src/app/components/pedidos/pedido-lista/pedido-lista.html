@@ -88,13 +88,47 @@
     </td>
     <td class="p-6 text-right">
       <div class="flex justify-end gap-2" (click)="$event.stopPropagation()">
+
         @if (p.estado === 'PENDIENTE') {
-          <button (click)="cambiarEstado(p.idPedido, 'EN_PROCESO')" class="p-2 hover:bg-blue-100 text-blue-600 rounded-xl transition-all active:scale-90">⚙️</button>
+          <button (click)="cambiarEstado(p.idPedido, 'EN_PROCESO')"
+                  class="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all text-[10px] font-black uppercase" title="Empezar a preparar">
+            <span>⚙️</span> PREPARAR
+          </button>
         }
+
         @if (p.estado === 'EN_PROCESO') {
-          <button (click)="cambiarEstado(p.idPedido, 'COMPLETADO')" class="p-2 hover:bg-green-100 text-green-600 rounded-xl transition-all active:scale-90">✅</button>
+          <button (click)="cambiarEstado(p.idPedido, 'ENVIADO')"
+                  class="flex items-center gap-2 px-3 py-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all text-[10px] font-black uppercase" title="Marcar como enviado">
+            <span>🚚</span> ENVIAR
+          </button>
+        }
+
+        @if (p.estado === 'ENVIADO') {
+          <button (click)="cambiarEstado(p.idPedido, 'COMPLETADO')"
+                  class="flex items-center gap-2 px-3 py-2 bg-green-50 text-green-600 rounded-xl hover:bg-green-600 hover:text-white transition-all text-[10px] font-black uppercase" title="Confirmar entrega">
+            <span>✅</span> ENTREGADO
+          </button>
+        }
+
+        @if (p.estado === 'PENDIENTE' || p.estado === 'EN_PROCESO') {
+          <button (click)="cambiarEstado(p.idPedido, 'CANCELADO')"
+                  class="p-2 text-slate-300 hover:text-red-500 transition-colors" title="Cancelar pedido">
+            ✕
+          </button>
         }
       </div>
+    </td>
+
+    <td class="p-6 text-center">
+  <span [ngClass]="{
+    'bg-orange-100 text-orange-600': p.estado === 'PENDIENTE',
+    'bg-blue-100 text-blue-600': p.estado === 'EN_PROCESO',
+    'bg-indigo-100 text-indigo-600': p.estado === 'ENVIADO',
+    'bg-green-100 text-green-600': p.estado === 'COMPLETADO',
+    'bg-red-100 text-red-600': p.estado === 'CANCELADO'
+  }" class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">
+    {{ p.estado }}
+  </span>
     </td>
   </tr>
 

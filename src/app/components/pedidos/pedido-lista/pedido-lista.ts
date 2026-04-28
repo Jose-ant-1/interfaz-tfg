@@ -13,18 +13,20 @@ export class PedidosListaComponent implements OnInit {
 
   idPedidoExpandido = signal<number | null>(null);
 
-  // Filtrar pedidos pendientes o en proceso
+  // Consideramos "Activos" los que aún no han salido o están preparándose
   pedidosPendientes = computed(() =>
     this.pedidoService
       .pedidos()
       .filter((p) => p.estado === 'PENDIENTE' || p.estado === 'EN_PROCESO'),
   );
 
-  // Filtrar pedidos terminados/enviados
+  // Consideramos "Historial" los que ya se enviaron, se entregaron o se cancelaron
   pedidosCompletados = computed(() =>
     this.pedidoService
       .pedidos()
-      .filter((p) => p.estado === 'COMPLETADO' || p.estado === 'CANCELADO'),
+      .filter(
+        (p) => p.estado === 'ENVIADO' || p.estado === 'COMPLETADO' || p.estado === 'CANCELADO',
+      ),
   );
 
   ngOnInit() {
