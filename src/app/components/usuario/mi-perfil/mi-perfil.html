@@ -134,6 +134,17 @@
               </div>
             </div>
 
+            <div class="mt-12 p-8 bg-red-50 rounded-[2rem] border border-red-100 flex justify-between items-center">
+              <div>
+                <h3 class="text-red-600 font-black uppercase text-xs tracking-widest">Zona de Peligro</h3>
+                <p class="text-red-400 text-sm font-medium">Una vez desactives tu cuenta, no podrás volver a iniciar sesión.</p>
+              </div>
+              <button (click)="darDeBaja()"
+                      class="bg-red-500 text-white px-6 py-3 rounded-xl font-black uppercase text-[10px] hover:bg-red-700 transition-all">
+                Darse de Baja
+              </button>
+            </div>
+
             <button type="submit" [disabled]="!perfilForm.form.valid"
                     class="w-full bg-slate-900 text-white py-6 rounded-[2rem] font-black uppercase tracking-widest shadow-2xl hover:bg-blue-600 disabled:bg-slate-200 disabled:text-slate-400 transition-all active:scale-[0.98]">
               Actualizar mis datos

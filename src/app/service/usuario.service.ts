@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Usuario } from '../models/usuario.model';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -42,4 +43,9 @@ export class UsuarioService {
   crear(usuario: Usuario) {
     return this.http.post(this.apiUrl, usuario);
   }
+
+  darDeBaja(id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}/baja`, {});
+  }
+
 }

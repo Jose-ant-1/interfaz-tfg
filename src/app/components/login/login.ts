@@ -20,7 +20,7 @@ export class Login {
   ) {}
 
   onSubmit() {
-    this.errorMessage = null; // Limpiar errores previos al intentar de nuevo
+    this.errorMessage = null;
 
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: () => {
@@ -29,15 +29,15 @@ export class Login {
       error: (err) => {
         console.error('Error en login', err);
 
-        // Manejo de errores específicos
+        // AQUÍ ES DONDE SE GESTIONA EL 403
         if (err.status === 403) {
           this.errorMessage = 'Tu cuenta está inactiva. Por favor, contacta con un administrador.';
         } else if (err.status === 401) {
           this.errorMessage = 'Credenciales incorrectas. Inténtalo de nuevo.';
         } else {
-          this.errorMessage = 'Ha ocurrido un error en el servidor. Inténtalo más tarde.';
+          this.errorMessage = 'Ha ocurrido un error en el servidor.';
         }
-      },
+      }
     });
   }
 }

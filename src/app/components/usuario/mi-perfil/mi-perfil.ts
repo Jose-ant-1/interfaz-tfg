@@ -45,6 +45,21 @@ export class MiPerfilComponent implements OnInit {
     });
   }
 
+// En mi-perfil.ts
+  darDeBaja() {
+    const u = this.usuario();
+    if (u && u.id) {
+      console.log("Dando de baja al ID:", u.id); // Mira la consola del navegador (F12)
+      this.usuarioService.darDeBaja(u.id).subscribe({
+        next: (resp) => {
+          console.log("Respuesta del servidor:", resp);
+          this.authService.logout();
+        },
+        error: (err) => console.error("Error al dar de baja:", err)
+      });
+    }
+  }
+
   actualizarPassword() {
     const u = this.usuario();
     if (!u || !this.nuevaPassword()) return;
@@ -65,4 +80,5 @@ export class MiPerfilComponent implements OnInit {
       });
     }
   }
+
 }
