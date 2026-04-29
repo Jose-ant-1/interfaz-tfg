@@ -4,6 +4,7 @@ import { AuthService } from '../../../service/auth.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Usuario } from '../../../models/usuario.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-mi-perfil',
@@ -14,6 +15,7 @@ import { Usuario } from '../../../models/usuario.model';
 export class MiPerfilComponent implements OnInit {
   private usuarioService = inject(UsuarioService);
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   usuario = signal<Usuario | null>(null);
   nuevaPassword = signal<string>(''); // Nueva señal para el campo
@@ -45,15 +47,14 @@ export class MiPerfilComponent implements OnInit {
     });
   }
 
-// En mi-perfil.ts
   darDeBaja() {
     const u = this.usuario();
     if (u && u.id) {
-      console.log("Dando de baja al ID:", u.id); // Mira la consola del navegador (F12)
       this.usuarioService.darDeBaja(u.id).subscribe({
         next: (resp) => {
-          console.log("Respuesta del servidor:", resp);
           this.authService.logout();
+          alert("Se ha dado de baja correctamente");
+          this.router.navigate(['/productos']);
         },
         error: (err) => console.error("Error al dar de baja:", err)
       });

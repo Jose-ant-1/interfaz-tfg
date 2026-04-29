@@ -36,4 +36,10 @@ export class PedidoService {
   crearPedido(pedido: any): Observable<any> {
     return this.http.post<any>(this.apiUrl, pedido);
   }
+
+  reclamar(id: number, motivo: string) {
+    // Enviamos un objeto JSON con el motivo
+    return this.http.put(`${this.apiUrl}/${id}/reclamar`, { motivo: motivo });
+  }
+
 }

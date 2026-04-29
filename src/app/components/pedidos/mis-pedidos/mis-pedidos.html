@@ -68,9 +68,14 @@
           </div>
 
           <div class="flex gap-4 w-full lg:w-auto">
-            <button class="flex-1 lg:px-8 py-4 rounded-2xl border-2 border-slate-100 font-black text-xs uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all">
-              Repetir
-            </button>
+            <div class="flex gap-4 w-full lg:w-auto">
+              @if (esReclamable(pedido)) {
+                <button (click)="reclamarPedido(pedido.idPedido)"
+                        class="flex-1 lg:px-6 py-4 rounded-2xl border-2 border-red-100 text-red-500 font-black text-xs uppercase tracking-widest hover:bg-red-50 transition-all">
+                  Reclamar / Incidencia
+                </button>
+              }
+            </div>
             <button [routerLink]="['/pedidos', pedido.idPedido]"
                     class="flex-1 lg:px-10 py-4 rounded-2xl bg-slate-900 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 hover:bg-blue-600 transition-all active:scale-95">
               Detalles

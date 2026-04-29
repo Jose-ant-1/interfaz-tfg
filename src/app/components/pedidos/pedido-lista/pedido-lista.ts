@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core'; // Añadimos computed
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { PedidoService } from '../../../service/pedido.service';
 import { CurrencyPipe, CommonModule } from '@angular/common';
 
@@ -10,23 +10,25 @@ import { CurrencyPipe, CommonModule } from '@angular/common';
 })
 export class PedidosListaComponent implements OnInit {
   public pedidoService = inject(PedidoService);
-
   idPedidoExpandido = signal<number | null>(null);
 
-  // Consideramos "Activos" los que aún no han salido o están preparándose
+  // Helper para normalizar strings de estado y evitar errores de comparación
+  private normalizarEstado(estado: string): string {
+    return estado?.toUpperCase().replace(/[\s_]/g, '') || '';
+  }
+
   pedidosPendientes = computed(() =>
-    this.pedidoService
-      .pedidos()
-      .filter((p) => p.estado === 'PENDIENTE' || p.estado === 'EN_PROCESO'),
+    this.pedidoService.pedidos().filter((p) => {
+      const s = this.normalizarEstado(p.estado);
+      return s === 'PENDIENTE' || s === 'ENPROCESO' || s === 'RECLAMADO';
+    }),
   );
 
-  // Consideramos "Historial" los que ya se enviaron, se entregaron o se cancelaron
   pedidosCompletados = computed(() =>
-    this.pedidoService
-      .pedidos()
-      .filter(
-        (p) => p.estado === 'ENVIADO' || p.estado === 'COMPLETADO' || p.estado === 'CANCELADO',
-      ),
+    this.pedidoService.pedidos().filter((p) => {
+      const s = this.normalizarEstado(p.estado);
+      return s === 'ENVIADO' || s === 'COMPLETADO' || s === 'CANCELADO';
+    }),
   );
 
   ngOnInit() {
@@ -38,8 +40,14 @@ export class PedidosListaComponent implements OnInit {
   }
 
   cambiarEstado(id: number, estado: string) {
-    this.pedidoService.actualizarEstado(id, estado).subscribe(() => {
-      this.pedidoService.obtenerTodos();
+    this.pedidoService.actualizarEstado(id, estado).subscribe({
+      next: () => this.pedidoService.obtenerTodos(),
+      error: (err) => console.error('Error al actualizar estado', err),
     });
+  }
+
+  // Nueva función para usar en el HTML y que los botones no fallen por un "_"
+  esEstado(pedidoEstado: string, estadoObjetivo: string): boolean {
+    return this.normalizarEstado(pedidoEstado) === this.normalizarEstado(estadoObjetivo);
   }
 }
