@@ -1,68 +1,132 @@
 <div class="min-h-screen bg-slate-50 p-6 md:p-12">
   <div class="max-w-4xl mx-auto">
-    <header class="mb-10">
-      <h1 class="text-4xl font-black text-slate-900 tracking-tight uppercase italic">
+
+    <header class="mb-10 text-center md:text-left">
+      <h1 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tight uppercase italic">
         Solicitud <span class="text-blue-600">Personalizada</span>
       </h1>
+      <p class="text-slate-500 font-medium mt-2">Cuéntanos tu proyecto y lo haremos realidad.</p>
     </header>
 
     <div class="bg-white rounded-[3rem] shadow-xl border border-slate-100 p-8 md:p-12">
-      <form (ngSubmit)="enviarSolicitud()" class="space-y-6">
+      <form (ngSubmit)="enviarSolicitud()" #solicitudForm="ngForm" class="space-y-8">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2">Tipo de Servicio</label>
-            <select [(ngModel)]="solicitud.tipoServicio" name="tipoServicio" class="w-full bg-slate-50 rounded-2xl p-4 outline-none font-bold">
-              <option value="IMPRESION_3D">Impresión 3D</option>
-              <option value="DISENYO_CAD">Diseño CAD</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2">Acabado</label>
-            <input type="text" [(ngModel)]="solicitud.acabado" name="acabado" placeholder="Ej: Bruto, Lijado..."
-                   class="w-full bg-slate-50 rounded-2xl p-4 outline-none font-bold">
+        <div class="space-y-4">
+          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">¿Qué servicio necesitas?</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <!-- Opción Impresión 3D -->
+            <div (click)="solicitud.tipoServicio = 'IMPRESION_3D'"
+                 [class.border-blue-500]="solicitud.tipoServicio === 'IMPRESION_3D'"
+                 [class.bg-blue-50]="solicitud.tipoServicio === 'IMPRESION_3D'"
+                 class="group cursor-pointer border-2 border-slate-100 p-8 rounded-[2rem] transition-all hover:border-blue-400">
+              <div class="flex items-center gap-4">
+                <div class="text-4xl">🖨️</div>
+                <div>
+                  <h4 class="font-black text-slate-900 uppercase text-sm">Impresión 3D</h4>
+                  <p class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Ya tengo mi modelo (.STL/.OBJ)</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Opción Diseño CAD -->
+            <div (click)="solicitud.tipoServicio = 'DISENYO_CAD'"
+                 [class.border-blue-500]="solicitud.tipoServicio === 'DISENYO_CAD'"
+                 [class.bg-blue-50]="solicitud.tipoServicio === 'DISENYO_CAD'"
+                 class="group cursor-pointer border-2 border-slate-100 p-8 rounded-[2rem] transition-all hover:border-blue-400">
+              <div class="flex items-center gap-4">
+                <div class="text-4xl">✏️</div>
+                <div>
+                  <h4 class="font-black text-slate-900 uppercase text-sm">Diseño & Modelado</h4>
+                  <p class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Tengo una idea o boceto</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
+        @if (solicitud.tipoServicio === 'IMPRESION_3D') {
+          <div class="animate-in fade-in slide-in-from-top-2 duration-500">
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-2">Sube tu archivo técnico</label>
+            <div class="relative group">
+              <input type="file" (change)="onFileSelected($event)" accept=".stl,.obj"
+                     class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+              <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2rem] p-12 text-center group-hover:border-blue-400 transition-colors">
+                <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                  <span class="text-2xl text-slate-400">📁</span>
+                </div>
+                <p class="text-slate-600 font-bold">
+                  {{ archivoSeleccionado ? archivoSeleccionado.name : 'Haz clic o arrastra tu archivo aquí' }}
+                </p>
+                <p class="text-[10px] text-slate-400 font-bold uppercase mt-2">Formatos aceptados: STL, OBJ (Máx. 50MB)</p>
+
+                @if (archivoSeleccionado) {
+                  <div class="mt-4 inline-flex items-center gap-2 bg-emerald-100 text-emerald-600 px-4 py-1.5 rounded-full text-[10px] font-black uppercase">
+                    <span>✓ Archivo listo</span>
+                    <span class="opacity-60">({{ (archivoSeleccionado.size / 1024 / 1024).toFixed(2) }} MB)</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2">Material</label>
-            <select [(ngModel)]="solicitud.material" name="material" class="w-full bg-slate-50 rounded-2xl p-4 outline-none font-bold">
-              <option [ngValue]="undefined">Seleccionar...</option>
+            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2 tracking-widest">Material Sugerido</label>
+            <select [(ngModel)]="solicitud.material" name="material" class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 outline-none font-bold text-slate-700 focus:border-blue-400 appearance-none">
+              <option [ngValue]="undefined">No estoy seguro / Por defecto</option>
               @for (m of materiales(); track m.id) {
                 <option [ngValue]="m">{{ m.nombreMaterial }}</option>
               }
             </select>
           </div>
           <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2">Tecnología</label>
-            <select [(ngModel)]="solicitud.tecnologia" name="tecnologia" class="w-full bg-slate-50 rounded-2xl p-4 outline-none font-bold">
-              <option [ngValue]="undefined">Seleccionar...</option>
-              @for (t of tecnologias(); track t.id) {
-                <option [ngValue]="t">{{ t.nombre }}</option>
-              }
-            </select>
+            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2 tracking-widest">Acabado Deseado</label>
+            <input type="text" [(ngModel)]="solicitud.acabado" name="acabado" placeholder="Ej: Pintado, Lijado, Bruto..."
+                   class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 outline-none font-bold text-slate-700 focus:border-blue-400">
           </div>
         </div>
 
-        <div>
-          <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2">Descripción</label>
-          <textarea [(ngModel)]="solicitud.descripcion" name="descripcion" rows="4"
-                    class="w-full bg-slate-50 rounded-2xl p-4 outline-none font-medium"></textarea>
+        <div class="space-y-6">
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2 tracking-widest">
+              {{ solicitud.tipoServicio === 'DISENYO_CAD' ? 'Descripción de tu idea' : 'Instrucciones de impresión' }}
+            </label>
+            <textarea [(ngModel)]="solicitud.descripcion" name="descripcion" rows="5" required
+                      [placeholder]="solicitud.tipoServicio === 'DISENYO_CAD' ? 'Explica qué quieres crear, medidas aproximadas, uso que le darás...' : 'Indica escala, porcentaje de relleno o si necesitas soportes especiales...'"
+                      class="w-full bg-slate-50 border border-slate-100 rounded-[2rem] p-6 outline-none font-medium text-slate-700 focus:border-blue-400 transition-all"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2 tracking-widest">Requisitos Especiales (Opcional)</label>
+            <textarea [(ngModel)]="solicitud.requisitosEspeciales" name="requisitosEspeciales" rows="2"
+                      placeholder="Ej: Tolerancias críticas, resistencia al calor, etc."
+                      class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 outline-none font-medium text-slate-700 focus:border-blue-400"></textarea>
+          </div>
         </div>
 
-        <div>
-          <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-2">Requisitos Especiales</label>
-          <textarea [(ngModel)]="solicitud.requisitosEspeciales" name="requisitosEspeciales" rows="2"
-                    class="w-full bg-slate-50 rounded-2xl p-4 outline-none font-medium"></textarea>
+        <div class="pt-4">
+          <button type="submit"
+                  [disabled]="!solicitud.descripcion || (solicitud.tipoServicio === 'IMPRESION_3D' && !archivoSeleccionado) || cargando()"
+                  class="w-full group relative overflow-hidden bg-slate-900 text-white py-6 rounded-[2rem] font-black uppercase tracking-[0.2em] transition-all hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-slate-200">
+
+            <div class="relative z-10 flex items-center justify-center gap-3">
+              @if (cargando()) {
+                <span class="animate-spin text-xl">⏳</span>
+                <span>Procesando...</span>
+              } @else {
+                <span>Enviar Solicitud a Revisión</span>
+                <span class="group-hover:translate-x-2 transition-transform">→</span>
+              }
+            </div>
+          </button>
+
+          <p class="text-center text-[9px] text-slate-400 uppercase font-black mt-6 tracking-widest">
+            Al enviar, nuestro equipo revisará tu solicitud lo más pronto posible.
+          </p>
         </div>
 
-
-
-        <button type="submit" [disabled]="!solicitud.descripcion || cargando()"
-                class="w-full bg-slate-900 text-white py-6 rounded-2xl font-black uppercase hover:bg-blue-600 transition-all">
-          {{ cargando() ? 'Enviando...' : 'Confirmar Solicitud' }}
-        </button>
       </form>
     </div>
   </div>

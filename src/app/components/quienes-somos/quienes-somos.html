@@ -1,0 +1,87 @@
+<div class="min-h-screen bg-slate-50">
+  <!-- Sección de Impacto: El Manifiesto -->
+  <section class="bg-slate-900 pt-32 pb-20 px-6 rounded-b-[4rem] shadow-2xl">
+    <div class="max-w-7xl mx-auto text-center">
+      <h2 class="text-blue-500 font-black uppercase tracking-[0.4em] text-xs mb-6">Manifesto 3D</h2>
+      <h1 class="text-5xl md:text-8xl font-black text-white uppercase italic tracking-tighter leading-[0.9] mb-12">
+        DE UN ARCHIVO DIGITAL <br>
+        A TU <span class="text-transparent border-b-4 border-blue-500" style="-webkit-text-stroke: 1px white;">REALIDAD</span>
+      </h1>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3 max-w-4xl mx-auto mt-20">
+        <div class="bg-slate-800/50 p-6 rounded-3xl border border-slate-700">
+          <p class="text-3xl font-black text-white mb-1">2024</p>
+          <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Fundación</p>
+        </div>
+        <div class="bg-slate-800/50 p-6 rounded-3xl border border-slate-700">
+          <p class="text-3xl font-black text-white mb-1">+1k</p>
+          <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Piezas Únicas</p>
+        </div>
+        <div class="bg-slate-800/50 p-6 rounded-3xl border border-slate-700">
+          <p class="text-3xl font-black text-white mb-1">100%</p>
+          <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Personalizado</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección: Nuestra Historia (Estilo Alterno) -->
+  <main class="max-w-7xl mx-auto px-6 py-24">
+    <div class="grid lg:grid-cols-2 gap-20 items-center mb-40">
+      <div class="space-y-8">
+        <div class="inline-block px-4 py-1 bg-blue-100 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest">
+          Nuestra Trayectoria
+        </div>
+        <h3 class="text-4xl md:text-5xl font-black text-slate-900 uppercase italic tracking-tighter leading-tight">
+          No somos una fábrica, <br> somos un <span class="text-blue-600 underline">laboratorio</span> de ideas.
+        </h3>
+        <p class="text-lg text-slate-600 font-medium leading-relaxed">
+          Nacimos de la frustración de ver cómo la impresión 3D se quedaba en manos de unos pocos. Queríamos democratizar la capacidad de crear, permitiendo que cualquier persona pudiera materializar su imaginación con la misma calidad que una gran industria[cite: 6, 14].
+        </p>
+        <div class="flex gap-4">
+          <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+            <span class="text-2xl">⚡</span>
+            <p class="text-xs font-bold text-slate-800">Prototipado <br> de alta velocidad</p>
+          </div>
+          <div class="p-4 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+            <span class="text-2xl">♻️</span>
+            <p class="text-xs font-bold text-slate-800">Materiales <br> Bio-compostables</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative group">
+        <div class="absolute inset-0 bg-blue-600 rounded-[3rem] rotate-3 group-hover:rotate-6 transition-transform"></div>
+        <div class="relative aspect-video bg-slate-200 rounded-[3rem] overflow-hidden shadow-2xl">
+          <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80"
+               class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="Tecnología 3D">
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: El Proceso (Timeline Horizontal) -->
+    <section class="space-y-16">
+      <div class="text-center">
+        <h2 class="text-3xl font-black text-slate-900 uppercase tracking-tighter">Cómo trabajamos</h2>
+        <div class="h-1.5 w-20 bg-blue-500 mx-auto mt-4 rounded-full"></div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-12 relative">
+        <!-- Línea conectora (solo desktop) -->
+        <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 -translate-y-1/2 z-0"></div>
+
+        @for (paso of procesos(); track paso.id) {
+          <div class="relative z-10 group">
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl group-hover:border-blue-500 transition-colors">
+              <div class="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center text-2xl font-black mb-6 group-hover:bg-blue-600 transition-colors">
+                {{ paso.id }}
+              </div>
+              <h4 class="text-xl font-black text-slate-900 uppercase mb-3">{{ paso.titulo }}</h4>
+              <p class="text-sm text-slate-500 font-medium leading-relaxed">{{ paso.descripcion }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  </main>
+</div>

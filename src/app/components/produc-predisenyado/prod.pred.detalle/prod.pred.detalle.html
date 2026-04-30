@@ -72,7 +72,7 @@
                     class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Disponibilidad</span>
                   <span class="font-bold" [class.text-green-600]="producto().stockDisponible > 0"
                         [class.text-red-500]="producto().stockDisponible <= 0">
-                    {{ producto().stockDisponible > 0 ? 'En Stock' : 'Agotado' }}
+                    {{ producto().stockDisponible > 0 ? 'En Stock'  : 'Agotado' }}
                   </span>
                 </div>
                 <div>

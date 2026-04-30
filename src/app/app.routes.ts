@@ -17,6 +17,7 @@ import { PedidoPersonalizadoComponent } from './components/solicitud-personaliza
 import { DetallePedidoComponent } from './components/pedidos/detalle-pedido/detalle-pedido';
 import { PagoComponent } from './components/pago/pago';
 import { MiPerfilComponent } from './components/usuario/mi-perfil/mi-perfil';
+import { QuienesSomosComponent } from './components/quienes-somos/quienes-somos';
 
 export const routes: Routes = [
   // --- RUTAS ABIERTAS (Públicas) ---
@@ -24,9 +25,9 @@ export const routes: Routes = [
   { path: 'registro', component: RegistroComponent },
   { path: 'productos', component: Catalogo },
   { path: 'carrito', component: CarritoComponent },
-
-  // Aquí está la clave: El usuario normal ve los materiales aquí
+  { path: 'quienes-somos', component: QuienesSomosComponent, title: 'Quiénes Somos | Tu Tienda' },
   { path: 'materiales', component: AdminMaterialesComponent },
+  { path: 'tecnologias', component: AdminTecnologiasComponent },
 
   // --- RUTAS DE USUARIO LOGUEADO (Cualquier rol) ---
   { path: 'mis-pedidos', component: MisPedidosComponent, canActivate: [authGuard] },
@@ -50,9 +51,6 @@ export const routes: Routes = [
   { path: 'productos/nuevo', component: CrearProdPredis, canActivate: [authGuard] }, // 1º LA ESPECÍFICA
   { path: 'productos/:id/editar', component: EditProdPredis, canActivate: [authGuard] }, // 2º LA DINÁMICA
   { path: 'productos/:id', component: DetalleProductoPredis },
-
-  // Gestión de tecnologías
-  { path: 'tecnologias', component: AdminTecnologiasComponent },
 
   // Pago
   { path: 'pago', component: PagoComponent, canActivate: [authGuard] },

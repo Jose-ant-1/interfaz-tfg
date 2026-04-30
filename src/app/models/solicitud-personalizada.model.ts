@@ -5,7 +5,7 @@ export interface SolicitudPersonalizada {
   id?: number;
   usuario?: Usuario;
   numeroSolicitud?: string;
-  tipoServicio?: string;
+  tipoServicio: 'IMPRESION_3D' | 'DISENYO_CAD';
   material?: Material;
   tecnologia?: Tecnologia;
   descripcion: string;
