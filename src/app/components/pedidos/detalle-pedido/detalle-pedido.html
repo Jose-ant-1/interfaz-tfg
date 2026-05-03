@@ -47,7 +47,10 @@
         </div>
       </div>
 
+      <!-- En detalle-pedido_2.html[cite: 36] -->
       <div class="grid md:grid-cols-2 gap-8">
+
+        <!-- BLOQUE RESUMEN (Precios y Gastos)[cite: 36] -->
         <div class="bg-slate-900 text-white rounded-[2.5rem] p-8 shadow-xl">
           <h2 class="text-xl font-black uppercase mb-6 tracking-tighter text-blue-400">Resumen</h2>
           <div class="space-y-3">
@@ -66,14 +69,35 @@
           </div>
         </div>
 
+        <!-- BLOQUE ENVÍO Y PAGO (Nuevos datos)[cite: 33, 36] -->
         <div class="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-sm">
-          <h2 class="text-xl font-black text-slate-800 uppercase mb-6 tracking-tighter">Envío</h2>
-          <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Dirección</p>
-          <p class="text-slate-700 font-medium mb-4">{{ p.direccionEnvio }}</p>
+          <h2 class="text-xl font-black text-slate-800 uppercase mb-6 tracking-tighter">Detalles de Entrega</h2>
+
+          <div class="mb-4">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Dirección de Envío</p>
+            <p class="text-slate-700 font-bold">{{ p.direccionEnvio }}</p>
+            <!-- Mostramos Localidad y CP[cite: 33] -->
+            <p class="text-slate-600">{{ p.ciudadEnvio }} {{ p.codigoPostalEnvio ? '(' + p.codigoPostalEnvio + ')' : '' }}</p>
+          </div>
+
+          <!-- Información de Pago Segura[cite: 31, 33] -->
+          @if (p.pagos && p.pagos.length > 0) {
+            <div class="mb-4 pt-4 border-t border-slate-50">
+              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Método de Pago</p>
+              <div class="flex items-center gap-2">
+                <span class="text-slate-700 font-medium">{{ p.pagos[0].metodoPago }}</span>
+                <span class="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-500 font-mono">
+            {{ p.pagos[0].detalles }}
+          </span>
+              </div>
+            </div>
+          }
 
           @if (p.notaCliente) {
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Notas</p>
-            <p class="text-slate-600 text-sm italic">"{{ p.notaCliente }}"</p>
+            <div class="pt-4 border-t border-slate-50">
+              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Notas para el repartidor</p>
+              <p class="text-slate-600 text-sm italic">"{{ p.notaCliente }}"</p>
+            </div>
           }
         </div>
       </div>

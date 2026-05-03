@@ -34,13 +34,17 @@ export class MiPerfilComponent implements OnInit {
     }
   }
 
+// En mi-perfil.component.ts[cite: 42]
   actualizarPerfil() {
     const u = this.usuario();
     if (!u) return;
 
-    this.usuarioService.actualizar(u.id, u).subscribe({
+    // Creamos una copia para no enviar la contraseña (aunque esté vacía)
+    const datosAActualizar = { ...u };
+    delete datosAActualizar.contrasenia; // Nos aseguramos de que no viaje este campo
+
+    this.usuarioService.actualizar(u.id, datosAActualizar).subscribe({
       next: () => {
-        // En lugar de un alert feo, podrías usar un flag para mostrar un mensaje en el HTML
         alert('¡Perfil actualizado con éxito!');
       },
       error: (err) => alert('Hubo un error al guardar los cambios'),

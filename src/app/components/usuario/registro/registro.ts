@@ -22,17 +22,40 @@ export class RegistroComponent {
     contrasenia: '',
   };
 
+  formatPhone(event: any) {
+    let value = event.target.value.replace(/\D/g, ''); // Elimina todo lo que no sea número
+
+    if (value.length > 9) value = value.substring(0, 9); // Limita a 9 dígitos
+
+    // Aplica el formato: 123 45 67 89
+    const part1 = value.substring(0, 3);
+    const part2 = value.substring(3, 5);
+    const part3 = value.substring(5, 7);
+    const part4 = value.substring(7, 9);
+
+    if (value.length > 7) {
+      value = `${part1} ${part2} ${part3} ${part4}`;
+    } else if (value.length > 5) {
+      value = `${part1} ${part2} ${part3}`;
+    } else if (value.length > 3) {
+      value = `${part1} ${part2}`;
+    }
+
+    this.registroData.telefono = value;
+  }
+
   onSubmit() {
-    // 1. Limpieza de datos (Trim)
+    // Al enviar, eliminamos los espacios para que el backend reciba solo números
+    const telefonoLimpio = this.registroData.telefono.replace(/\s/g, '');
+
     const dataFinal = {
       nombre: this.registroData.nombre.trim(),
       apellidos: this.registroData.apellidos.trim(),
       email: this.registroData.email.trim(),
-      telefono: this.registroData.telefono.trim(),
+      telefono: telefonoLimpio, // Enviamos el teléfono sin espacios
       contrasenia: this.registroData.contrasenia,
     };
 
-    // 2. Validación final de seguridad
     if (!dataFinal.nombre || !dataFinal.apellidos || dataFinal.telefono.length !== 9) {
       alert('Por favor, revisa que todos los campos sean correctos.');
       return;
@@ -40,14 +63,9 @@ export class RegistroComponent {
 
     this.authService.registro(dataFinal).subscribe({
       next: (response) => {
-        console.log('Registro exitoso:', response);
-        alert('¡Cuenta creada correctamente! Ahora puedes iniciar sesión.');
         this.router.navigate(['/login']);
       },
-      error: (err) => {
-        console.error('Error en registro:', err);
-        alert('No se pudo crear la cuenta. Es posible que el email ya esté en uso.');
-      },
+      error: (err) => console.error(err)
     });
   }
 }

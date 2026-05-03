@@ -19,13 +19,19 @@
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-      @for (producto of productos(); track producto.id) {
+      @for (producto of productosOrdenados(); track producto.id) {
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group"
+             [ngClass]="{'opacity-60 grayscale': !producto.disponible}"
              [routerLink]="['/productos', producto.id]">
 
           <div class="h-80 bg-slate-100 relative flex items-center justify-center text-slate-300 overflow-hidden">
             @if (producto.imagenUrl) {
               <img [src]="producto.imagenUrl" [alt]="producto.nombreProducto" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            }
+            @if (!producto.disponible) {
+              <div class="absolute inset-0 bg-black/10 flex items-center justify-center">
+                <span class="bg-white/90 text-slate-900 px-4 py-2 rounded-xl font-black uppercase italic text-sm shadow-xl">No Disponible</span>
+              </div>
             }
           </div>
 
@@ -45,13 +51,7 @@
                 <button (click)="$event.stopPropagation(); agregarAlCarrito(producto)"
                         [disabled]="producto.stockDisponible <= 0"
                         class="col-span-4 bg-slate-900 text-white px-4 py-4 rounded-2xl hover:bg-blue-600 transition-all font-black uppercase text-sm tracking-tighter active:scale-95 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed disabled:hover:bg-slate-300">
-
-                  @if (producto.stockDisponible > 0) {
-                    Añadir al Carrito
-                  } @else {
-                    Sin Existencias
-                  }
-
+                  {{ producto.stockDisponible > 0 ? 'Añadir al Carrito' : 'Sin Existencias' }}
                 </button>
               }
 
@@ -63,10 +63,11 @@
                   Editar
                 </button>
 
-                <button (click)="$event.stopPropagation(); borrarProducto(producto.id)"
-                        class="col-span-2 bg-red-50 text-red-500 px-4 py-4 rounded-2xl hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2 font-bold uppercase text-xs">
+                <button (click)="$event.stopPropagation(); toggleDisponibilidad(producto)"
+                        [ngClass]="producto.disponible ? 'bg-red-50 text-red-500 hover:bg-red-500' : 'bg-green-50 text-green-600 hover:bg-green-600'"
+                        class="col-span-2 px-4 py-4 rounded-2xl hover:text-white transition-all flex items-center justify-center gap-2 font-bold uppercase text-xs">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                  Borrar
+                  {{ producto.disponible ? 'Borrar' : 'Activar' }}
                 </button>
               }
 

@@ -41,12 +41,18 @@
 
       <div>
         <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Teléfono</label>
-        <input type="tel" [(ngModel)]="registroData.telefono" name="telefono" required pattern="[0-9]{9}"
+        <input type="tel"
+               [ngModel]="registroData.telefono"
+               (input)="formatPhone($event)"
+               name="telefono"
+               required
+               maxlength="12"
                #telInput="ngModel"
                class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-semibold text-slate-700"
-               placeholder="Ej: 600123456">
+               placeholder="Ej: 123 45 67 89">
+
         @if (telInput.invalid && telInput.touched) {
-          <p class="text-[10px] text-red-500 mt-1 ml-2 font-bold uppercase italic">Debe tener 9 dígitos</p>
+          <p class="text-[10px] text-red-500 mt-1 ml-2 font-bold uppercase italic">Dato obligatorio</p>
         }
       </div>
 

@@ -83,4 +83,12 @@ export class CarritoComponent {
       }
     });
   }
+
+  vaciarCarrito() {
+    if (confirm('¿Estás seguro de que quieres vaciar todo el carrito?')) {
+      this.carritoService.limpiarCarrito();
+      this.erroresStock.set([]); // Limpiamos posibles errores de stock previos
+    }
+  }
+
 }

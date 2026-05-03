@@ -24,7 +24,12 @@ export class EditUsuarioComponent implements OnInit {
     if (id && id !== 'nuevo') {
       // MODO EDICIÓN
       this.usuarioService.obtenerPorId(+id).subscribe({
-        next: (data) => this.usuario.set(data),
+        next: (data) => {
+          // IMPORTANTE: Limpiamos la contraseña del objeto local
+          // para que el input empiece vacío y no enviemos el hash actual.
+          data.contrasenia = '';
+          this.usuario.set(data);
+        },
         error: (err) => console.error('Error al cargar', err),
       });
     } else {
@@ -49,45 +54,25 @@ export class EditUsuarioComponent implements OnInit {
     const u = this.usuario();
     if (!u) return;
 
-    // 1. Limpieza básica (Trim) para evitar " " como nombre
-    u.nombre = u.nombre.trim();
-    u.apellidos = u.apellidos.trim();
-    u.email = u.email.trim();
-
-    // 2. Validación de seguridad extra
-    if (!u.nombre || !u.apellidos || !u.email) {
-      alert('Por favor, rellena todos los campos obligatorios.');
+    // Validamos longitud solo si el usuario escribió algo en el campo de edición
+    if (u.id !== 0 && u.contrasenia && u.contrasenia.length > 0 && u.contrasenia.length < 4) {
+      alert('La nueva contraseña debe tener al menos 4 caracteres.');
       return;
     }
 
-    // Validar que el email tenga un formato básico (aunque el HTML ya lo hace)
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(u.email)) {
-      alert('El formato del email no es válido.');
-      return;
-    }
-
-    // Si es nuevo, asegurar que hay contraseña
-    if (u.id === 0 && (!u.contrasenia || u.contrasenia.length < 4)) {
-      alert('La contraseña temporal debe tener al menos 4 caracteres.');
-      return;
-    }
-
-    u.codigoPostal = Number(u.codigoPostal) || 0;
-
-    const peticion =
-      u.id === 0 ? this.usuarioService.crear(u) : this.usuarioService.actualizar(u.id, u);
+    // Ahora 'actualizar' enviará el objeto con la contraseña nueva o vacía
+    // y el cambio que hicimos en el Backend (Paso 1) decidirá qué hacer.[cite: 59, 61]
+    const peticion = u.id === 0 ?
+      this.usuarioService.crear(u) :
+      this.usuarioService.actualizar(u.id, u);
 
     peticion.subscribe({
       next: () => {
-        alert(u.id === 0 ? '¡Usuario creado con éxito!' : 'Perfil actualizado');
+        alert('Usuario guardado con éxito');
         this.router.navigate(['/admin/usuarios']);
       },
-      error: (err) => {
-        console.error('Error en la API:', err);
-        // Un error común es el 409 (Conflict) si el email ya existe
-        alert('No se pudo guardar. Es posible que el email ya esté registrado.');
-      },
+      error: (err) => alert('Error al guardar')
     });
   }
+
 }

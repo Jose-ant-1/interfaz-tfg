@@ -16,10 +16,12 @@ export interface Pedido {
   total: number;
   estado: string;
   direccionEnvio: string;
-  notaCliente?: string; // <-- Faltaba (corresponde a nota_cliente)
-  fechaPedido: string; // LocalDate en Java
-  fechaActualizacion?: string; // <-- Faltaba (corresponde a fecha_actualizacion)
-
+  ciudadEnvio?: string;
+  codigoPostalEnvio?: string;
+  notaCliente?: string;
+  fechaPedido: string;
+  fechaActualizacion?: string;
+  metodoPagoDetalle?: string;
   items?: ItemPedido[];
 
   // Vinculamos con el modelo de Usuario completo para tener acceso a todos sus datos

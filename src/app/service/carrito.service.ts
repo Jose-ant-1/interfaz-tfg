@@ -71,7 +71,7 @@ export class CarritoService {
         error: (err) => console.error('Error al restar producto:', err),
       });
     } else {
-      // ... tu lógica de localStorage actual ...
+      this.actualizarEstadoLocal({ id: idProducto }, -1);
     }
   }
 

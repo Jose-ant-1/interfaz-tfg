@@ -1,7 +1,11 @@
 export interface Pago {
   id?: number;
   usuario?: { id: number  };
-  pedido?: {idPedido: number};
+  pedido?: {
+    idPedido: number,
+    ciudadEnvio?: string,
+    codigoPostalEnvio?: string
+  };
   solicitud?: {id: number};
   importe: number;
   metodoPago: string; // 'TARJETA', 'PAYPAL', etc.

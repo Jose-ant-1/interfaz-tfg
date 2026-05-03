@@ -1,7 +1,8 @@
+// [source: 26] - ProdPredService.ts (Código corregido)
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {Producto} from '../models/prod.predis.model';
+import { Producto } from '../models/prod.predis.model';
 
 @Injectable({
   providedIn: 'root'
@@ -9,10 +10,13 @@ import {Producto} from '../models/prod.predis.model';
 export class ProdPredService {
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:8080/api/productos';
+
+  // Guardará TODOS los productos (disponibles y no disponibles)
   productos = signal<Producto[]>([]);
 
   obtenerTodos(): void {
     this.http.get<Producto[]>(this.apiUrl).subscribe(data => {
+      // Guardamos la respuesta tal cual viene de la base de datos
       this.productos.set(data);
     });
   }
@@ -27,10 +31,6 @@ export class ProdPredService {
 
   crear(producto: Producto): Observable<any> {
     return this.http.post(this.apiUrl, producto);
-  }
-
-  eliminar(id: number | undefined): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
 }

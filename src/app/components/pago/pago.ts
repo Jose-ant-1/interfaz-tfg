@@ -1,10 +1,13 @@
-import { Component, inject, signal } from '@angular/core';
+import {Component, inject, OnInit, signal} from '@angular/core';
 import { CarritoService } from '../../service/carrito.service';
 import { PagoService } from '../../service/pago.service';
 import { PedidoService } from '../../service/pedido.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CurrencyPipe } from '@angular/common';
+import {UsuarioService} from '../../service/usuario.service';
+import {AuthService} from '../../service/auth.service';
+import {Pago} from '../../models/pago.model';
 
 @Component({
   selector: 'app-pago',
@@ -12,20 +15,38 @@ import { CurrencyPipe } from '@angular/common';
   templateUrl: './pago.html',
   imports: [FormsModule, CurrencyPipe],
 })
-export class PagoComponent {
+export class PagoComponent implements OnInit {
   private carritoService = inject(CarritoService);
   private pagoService = inject(PagoService);
   private pedidoService = inject(PedidoService);
+  private usuarioService = inject(UsuarioService);
+  private authService = inject(AuthService); // Necesitas el servicio donde guardes el email al hacer login
   private router = inject(Router);
-
-  // Señales para el formulario
-  direccion = signal('');
-  notas = signal('');
 
   // Datos de tarjeta
   numeroTarjeta = signal('');
   fechaExpiracion = signal(''); // Formato MM/YY
   cvc = signal('');
+
+  ngOnInit() {
+    // Recuperamos el email que ya gestiona tu AuthService
+    const email = this.authService.getEmail();
+
+    if (email) {
+      // Usamos el método obtenerPorEmail que ya tienes definido
+      this.usuarioService.obtenerPorEmail(email).subscribe({
+        next: (user) => {
+          if (user) {
+            // Mapeamos los campos del modelo Usuario
+            this.datosEnvio.direccion = user.direccion || '';
+            this.datosEnvio.ciudad = user.ciudad || '';
+            this.datosEnvio.codigoPostal = user.codigoPostal ? user.codigoPostal.toString() : '';
+          }
+        },
+        error: (err) => console.error('Error al precargar datos:', err)
+      });
+    }
+  }
 
   // Formatear número de tarjeta: Bloques de 4
   onNumeroTarjetaInput(event: any) {
@@ -75,14 +96,19 @@ export class PagoComponent {
   cargando = signal(false);
 
   // Señales para controlar el stock
-  datosEnvio = { direccion: '', nota: '' };
+  datosEnvio = {
+    direccion: '',
+    ciudad: '',
+    codigoPostal: '',
+    nota: ''
+  };
 
   async realizarPago() {
     // Si hay errores de stock, no permitimos continuar
 
     // Validar Dirección
-    if (!this.datosEnvio.direccion) {
-      alert('Por favor, introduce una dirección de envío.');
+    if (!this.datosEnvio.direccion || !this.datosEnvio.ciudad || !this.datosEnvio.codigoPostal) {
+      alert('Por favor, rellena todos los datos de envío (Dirección, Ciudad y CP).');
       return;
     }
 
@@ -117,33 +143,35 @@ export class PagoComponent {
     const pedidoDTO = {
       total: totalLimpio,
       direccionEnvio: this.datosEnvio.direccion,
+      ciudadEnvio: this.datosEnvio.ciudad,
+      codigoPostalEnvio: this.datosEnvio.codigoPostal,
       notaCliente: this.datosEnvio.nota,
       items: this.carritoItems().map((item) => ({
-        // CAMBIO CLAVE: En el DTO de Java se llama 'idProducto', no 'productoId'
         idProducto: item.productoId || item.id,
         cantidad: item.cantidad,
-        // Añadimos el precio unitario ya que el DTO lo espera
         precioUnitario: item.precio,
       })),
     };
 
-    console.log('Enviando DTO corregido:', pedidoDTO);
-
-    console.log('Enviando pedido al servidor:', pedidoDTO); // Revisa esto en la consola
+    console.log('Enviando Pedido con datos de envío detallados:', pedidoDTO);
 
     this.pedidoService.crearPedido(pedidoDTO).subscribe({
       next: (pedidoCreado: any) => {
-        // Usamos slice para evitar el deprecated substr
+        // ... (lógica de procesamiento de pago simulado)[cite: 47, 48]
         const randomPart = Math.random().toString(36).slice(2, 11).toUpperCase();
         const transaccionId = `TRANS-${randomPart}`;
 
-        const pagoData = {
+        // NUEVO: Extraemos los últimos 4 dígitos de la señal de la tarjeta[cite: 43]
+        const numTarjetaStr = this.numeroTarjeta().replace(/\s/g, '');
+        const ultimos4 = numTarjetaStr.slice(-4);
+
+        const pagoData: Pago = {
           pedido: { idPedido: pedidoCreado.idPedido },
           importe: this.totalCarrito(),
           metodoPago: 'TARJETA',
           estadoPago: 'COMPLETADO',
-          idTransaccion: transaccionId,
-          detalles: 'Pago realizado con éxito',
+          idTransaccion: `TRANS-${Math.random().toString(36).toUpperCase()}`,
+          detalles: `Visa/MC **** ${ultimos4}` // Guardamos solo la máscara[cite: 31, 34]
         };
 
         this.pagoService.procesarPagoSimulado(pagoData).subscribe({
@@ -160,11 +188,7 @@ export class PagoComponent {
       error: (err) => {
         this.cargando.set(false);
         console.error('Error al crear pedido:', err);
-        // Si el servidor devuelve error de stock (aunque hayamos validado en front), lo capturamos aquí
-        if (err.status === 400) {
-          alert(err.error?.error || 'Error al procesar el pedido. Verifica el stock.');
-        }
-      },
+      }
     });
   }
 }

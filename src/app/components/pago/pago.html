@@ -9,8 +9,17 @@
         <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
           <h2 class="text-xl font-bold mb-6 text-slate-800">Datos de Envío</h2>
           <div class="space-y-4">
-            <input type="text" [(ngModel)]="datosEnvio.direccion" placeholder="Dirección completa"
+            <input type="text" [(ngModel)]="datosEnvio.direccion" placeholder="Dirección completa (Calle, número, piso)"
                    class="w-full bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 border border-transparent focus:border-blue-500 transition-all font-medium">
+
+            <div class="grid grid-cols-2 gap-4">
+              <input type="text" [(ngModel)]="datosEnvio.ciudad" placeholder="Ciudad"
+                     class="w-full bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 border border-transparent focus:border-blue-500 transition-all font-medium">
+
+              <input type="text" [(ngModel)]="datosEnvio.codigoPostal" placeholder="Código Postal"
+                     class="w-full bg-slate-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 border border-transparent focus:border-blue-500 transition-all font-medium">
+            </div>
+
             <textarea [(ngModel)]="datosEnvio.nota" placeholder="Notas para el repartidor (opcional)"
                       class="w-full bg-slate-50 p-4 rounded-2xl outline-none h-24 focus:ring-2 focus:ring-blue-500 border border-transparent focus:border-blue-500 transition-all font-medium"></textarea>
           </div>

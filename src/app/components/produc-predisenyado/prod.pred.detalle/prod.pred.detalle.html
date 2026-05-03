@@ -131,7 +131,7 @@
                     </div>
                   </div>
 
-                  @if (authService.currentUser()?.roles?.includes('ADMIN')) {
+                  @if ((authService.currentUser()?.roles || []).includes('ADMIN')) {
                     <button (click)="eliminarComentario(v.id!)"
                             class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all p-2 bg-slate-50 rounded-xl">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,41 +155,53 @@
         </div>
 
         <div class="lg:col-span-1">
-          <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-xl shadow-slate-200/50 sticky top-8">
-            <h3 class="text-xl font-black text-slate-900 uppercase italic tracking-tighter mb-6">Tu experiencia</h3>
-
-            <div class="space-y-6">
-              <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">¿Cuántas
-                  estrellas le das?</label>
-                <div class="flex gap-2">
-                  @for (star of [1, 2, 3, 4, 5]; track star) {
-                    <button (click)="nuevaValoracion.puntuacion = star"
-                            class="text-3xl transition-all hover:scale-110 active:scale-90"
-                            [class.text-yellow-400]="nuevaValoracion.puntuacion >= star"
-                            [class.text-slate-200]="nuevaValoracion.puntuacion < star">
-                      ★
-                    </button>
-                  }
-                </div>
-              </div>
-
-              <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Cuéntanos
-                  más</label>
-                <textarea [(ngModel)]="nuevaValoracion.comentario"
-                          rows="4"
-                          class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-700 text-sm"
-                          placeholder="Calidad del material, detalles..."></textarea>
-              </div>
-
-              <button (click)="enviarValoracion(producto().id)"
-                      [disabled]="!nuevaValoracion.comentario || cargando()"
-                      class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-900 transition-all shadow-lg shadow-blue-100 disabled:bg-slate-100 disabled:text-slate-300">
-                {{ cargando() ? 'Enviando...' : 'Publicar Opinión' }}
-              </button>
+          @if ((authService.currentUser()?.roles || []).includes('ADMIN')) {
+            <!-- Mensaje informativo para el admin (opcional) -->
+            <div class="bg-blue-50 border border-blue-200 rounded-[2.5rem] p-8 text-center">
+              <p class="text-blue-600 font-bold uppercase text-xs tracking-widest">
+                Modo Administrador
+              </p>
+              <p class="text-slate-500 text-sm mt-2">
+                Los administradores no pueden publicar valoraciones de productos.
+              </p>
             </div>
-          </div>
+          } @else {
+            <!-- Formulario original para usuarios normales o no logueados -->
+            <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-xl shadow-slate-200/50 sticky top-8">
+              <h3 class="text-xl font-black text-slate-900 uppercase italic tracking-tighter mb-6">Tu experiencia</h3>
+
+              <div class="space-y-6">
+                <!-- ... resto del formulario (estrellas, textarea y botón) ... -->
+                <div>
+                  <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">¿Cuántas estrellas le das?</label>
+                  <div class="flex gap-2">
+                    @for (star of [1, 2, 3, 4, 5]; track star) {
+                      <button (click)="nuevaValoracion.puntuacion = star"
+                              class="text-3xl transition-all hover:scale-110 active:scale-90"
+                              [class.text-yellow-400]="nuevaValoracion.puntuacion >= star"
+                              [class.text-slate-200]="nuevaValoracion.puntuacion < star">
+                        ★
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Cuéntanos más</label>
+                  <textarea [(ngModel)]="nuevaValoracion.comentario"
+                            rows="4"
+                            class="w-full bg-slate-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-700 text-sm"
+                            placeholder="Calidad del material, detalles..."></textarea>
+                </div>
+
+                <button (click)="enviarValoracion(producto().id)"
+                        [disabled]="!nuevaValoracion.comentario || cargando() || !authService.currentUser()"
+                        class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-slate-900 transition-all shadow-lg shadow-blue-100 disabled:bg-slate-100 disabled:text-slate-300">
+                  {{ !authService.currentUser() ? 'Inicia sesión para opinar' : (cargando() ? 'Enviando...' : 'Publicar Opinión') }}
+                </button>
+              </div>
+            </div>
+          }
         </div>
 
       </div>

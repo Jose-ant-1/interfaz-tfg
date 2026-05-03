@@ -122,10 +122,13 @@
                         <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
                           <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Ficha Técnica</h4>
                           <div class="space-y-2">
+                            @if (esAdmin()) {
+
                             <div class="flex justify-between text-xs">
                               <span class="text-slate-400 font-bold uppercase">Stock Actual:</span>
                               <span class="font-mono font-bold text-slate-700">{{ m.stockGramo }}g</span>
                             </div>
+                            }
                             <div class="flex justify-between text-xs">
                               <span class="text-slate-400 font-bold uppercase">Estado:</span>
                               <span [class]="m.disponible ? 'text-green-600' : 'text-red-600'" class="font-bold">

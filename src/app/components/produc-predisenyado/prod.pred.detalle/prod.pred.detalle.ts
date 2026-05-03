@@ -70,9 +70,11 @@ export class DetalleProductoPredis implements OnInit {
   enviarValoracion(productoId: number) {
     const user = this.authService.currentUser();
 
-    // Validamos solo que el objeto de usuario exista (sesión iniciada)
-    if (!user) {
-      console.warn('⚠️ No hay sesión activa');
+    // Usamos el operador && para asegurar que existe el usuario y sus roles
+    const isAdmin = user && user.roles && user.roles.includes('ADMIN');
+
+    if (!user || isAdmin) {
+      console.warn('⚠️ Acción no permitida');
       return;
     }
 
