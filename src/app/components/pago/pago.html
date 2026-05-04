@@ -71,7 +71,7 @@
         <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 sticky top-8">
           <h2 class="text-xl font-bold mb-6 text-slate-800">Resumen del Pedido</h2>
           <div class="space-y-3 mb-6">
-            @for (item of carritoItems(); track item.id) {
+            @for (item of itemsAMostrar(); track item.id) {
               <div class="flex justify-between text-sm">
                 <span class="text-slate-600 font-medium">{{item.cantidad}}x {{item.nombre}}</span>
                 <span class="font-bold text-slate-900">{{item.precio * item.cantidad | currency:'EUR'}}</span>
@@ -83,7 +83,7 @@
 
           <div class="flex justify-between text-xl font-black text-slate-900 uppercase">
             <span>Total</span>
-            <span class="text-blue-600">{{totalCarrito() | currency:'EUR'}}</span>
+            <span class="text-blue-600">{{totalAMostrar() | currency:'EUR'}}</span>
           </div>
 
           <button (click)="realizarPago()"

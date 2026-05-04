@@ -49,6 +49,11 @@ export class MisPedidosComponent implements OnInit {
     }
   }
 
+  esEstado(pedidoEstado: string, estadoObjetivo: string): boolean {
+    const normalizar = (s: string) => s?.toUpperCase().replace(/[\s_]/g, '') || '';
+    return normalizar(pedidoEstado) === normalizar(estadoObjetivo);
+  }
+
   esReclamable(pedido: Pedido): boolean {
     // 1. Si ya está reclamado, no se puede volver a reclamar
     if (pedido.estado === 'RECLAMADO') return false;

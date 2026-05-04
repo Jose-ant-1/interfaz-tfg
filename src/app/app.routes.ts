@@ -54,6 +54,7 @@ export const routes: Routes = [
 
   // Pago
   { path: 'pago', component: PagoComponent, canActivate: [authGuard] },
+  { path: 'pago/:id', component: PagoComponent, canActivate: [authGuard] }, // Nueva ruta para personalizados
 
   // Mi perfil
   { path: 'mi-perfil', component: MiPerfilComponent, canActivate: [authGuard] },

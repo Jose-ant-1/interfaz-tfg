@@ -8,6 +8,7 @@ import { SolicitudPersonalizada } from '../../models/solicitud-personalizada.mod
 import { Material, Tecnologia } from '../../models/configuracion.model';
 import { ArchivoService } from '../../service/archivo-solicitud.service';
 
+
 @Component({
   selector: 'app-pedido-personalizado',
   standalone: true,
@@ -98,22 +99,28 @@ export class PedidoPersonalizadoComponent implements OnInit {
   }
 
   private vincularArchivo(solicitudId: number) {
+    // Definimos el objeto con tipo 'any' para saltar la validación estricta
+    // que está causando el conflicto[cite: 21]
     const archivoData: any = {
-      // Usamos any temporalmente para evitar el error de asignación TS2345
       nombreArchivo: this.archivoSeleccionado!.name,
       tipoArchivo: this.archivoSeleccionado!.type,
-      tamanio: this.archivoSeleccionado!.size / 1024,
+      tamanio: Math.round(this.archivoSeleccionado!.size / 1024),
       url: 'uploads/' + this.archivoSeleccionado!.name,
       fechaSubida: new Date().toISOString().split('T')[0],
-      solicitud: { id: solicitudId }, // Ajustado para que coincida con @JoinColumn(name = "id_solicitud")
+      solicitud: { id: solicitudId } // Esto se mapea al @ManyToOne en Java
     };
 
     this.archivoService.guardarReferenciaArchivo(archivoData).subscribe({
-      next: () => this.router.navigate(['/mis-pedidos']),
+      next: () => {
+        this.cargando.set(false);
+        alert('¡Solicitud y archivo enviados con éxito!');
+        this.router.navigate(['/mis-pedidos']);
+      },
       error: (err) => {
         console.error('Error al vincular archivo:', err);
         this.cargando.set(false);
-      },
+        alert('Se creó la solicitud pero hubo un error con el archivo.');
+      }
     });
   }
 }

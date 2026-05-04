@@ -42,4 +42,13 @@ export class PedidoService {
     return this.http.put(`${this.apiUrl}/${id}/reclamar`, { motivo: motivo });
   }
 
+  confirmarPagoPedido(id: number): Observable<any> {
+    // Este endpoint ahora es accesible para usuarios normales (ROLE_USER)[cite: 32]
+    return this.http.post(`${this.apiUrl}/${id}/confirmar-pago`, {});
+  }
+
+  actualizarEstadoConPrecio(id: number, datos: {estado: string, total: number}) {
+    return this.http.patch(`${this.apiUrl}/${id}/estado`, datos);
+  }
+
 }

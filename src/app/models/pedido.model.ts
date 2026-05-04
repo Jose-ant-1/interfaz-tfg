@@ -1,5 +1,6 @@
 import { Producto } from './prod.predis.model';
 import { Usuario } from './usuario.model';
+import {SolicitudPersonalizada} from './solicitud-personalizada.model';
 
 export interface ItemPedido {
   id: number;
@@ -22,6 +23,7 @@ export interface Pedido {
   fechaPedido: string;
   fechaActualizacion?: string;
   metodoPagoDetalle?: string;
+  solicitud?: SolicitudPersonalizada;
   items?: ItemPedido[];
 
   // Vinculamos con el modelo de Usuario completo para tener acceso a todos sus datos
