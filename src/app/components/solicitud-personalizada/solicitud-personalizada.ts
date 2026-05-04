@@ -51,13 +51,30 @@ export class PedidoPersonalizadoComponent implements OnInit {
   }
 
   // 2. FUNCIÓN PARA PREPARAR LOS DATOS (Evita errores de TS2339)
-  private prepararData(): SolicitudPersonalizada {
+  private prepararData(): any {
     const user = this.authService.currentUser();
-    return {
-      ...this.solicitud,
-      usuario: { id: user?.id } as any,
+
+    // Creamos una copia limpia del objeto
+    const data: any = {
+      tipoServicio: this.solicitud.tipoServicio,
+      descripcion: this.solicitud.descripcion,
+      requisitosEspeciales: this.solicitud.requisitosEspeciales,
+      acabado: this.solicitud.acabado,
+      estado: 'EVALUANDO',
+      usuario: { id: user?.id },
       numeroSolicitud: 'SOL-' + Date.now(),
+      // Eliminamos fechaSolicitud de aquí; deja que el @PrePersist de Java la ponga
     };
+
+    // Solo incluimos material o tecnología si realmente se han seleccionado
+    if (this.solicitud.material?.id) {
+      data.material = { id: this.solicitud.material.id };
+    }
+    if (this.solicitud.tecnologia?.id) {
+      data.tecnologia = { id: this.solicitud.tecnologia.id };
+    }
+
+    return data;
   }
 
   // 3. MÉTODO DE ENVÍO ÚNICO Y UNIFICADO
