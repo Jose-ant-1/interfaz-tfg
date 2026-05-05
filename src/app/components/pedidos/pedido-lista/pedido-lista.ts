@@ -29,7 +29,13 @@ export class PedidosListaComponent implements OnInit {
     this.pedidoService.pedidos().filter((p) => {
       const s = this.normalizarEstado(p.estado);
       // Añadimos EVALUANDO y PRESUPUESTADO a la lista de gestión activa
-      return s === 'PENDIENTE' || s === 'ENPROCESO' || s === 'RECLAMADO' || s === 'EVALUANDO' || s === 'PRESUPUESTADO';
+      return (
+        s === 'PENDIENTE' ||
+        s === 'ENPROCESO' ||
+        s === 'RECLAMADO' ||
+        s === 'EVALUANDO' ||
+        s === 'PRESUPUESTADO'
+      );
     }),
   );
 
@@ -54,57 +60,72 @@ export class PedidosListaComponent implements OnInit {
 
     this.pedidoService.getPedidoById(id).subscribe({
       next: (pedidoCompleto: any) => {
-        // Intentamos sacar el código SOL-XXXX de la nota si p.solicitud no existe
-        if (!pedidoCompleto.solicitud && pedidoCompleto.notaCliente?.includes('SOL-')) {
-          const codigoSolicitud = pedidoCompleto.notaCliente.split(': ')[1]; // Extrae "SOL-1777..."
+        // 1. Forzamos la actualización de TODO el objeto pedido en la lista
+        this.pedidoService.pedidos.update((lista) =>
+          lista.map((p) => (p.idPedido === id ? { ...p, ...pedidoCompleto } : p)),
+        );
 
-          // Ahora buscamos todas las solicitudes y filtramos por ese código
-          this.solicitudService.findAll().subscribe(solicitudes => {
-            const solicitudReal = solicitudes.find(s => s.numeroSolicitud === codigoSolicitud);
-
+        // 2. Lógica para capturar la solicitud (vía relación o nota)
+        if (pedidoCompleto.solicitud?.id) {
+          this.cargarArchivoDeSolicitud(pedidoCompleto.solicitud.id);
+        } else if (pedidoCompleto.notaCliente?.includes('SOL-')) {
+          const codigoSolicitud = pedidoCompleto.notaCliente.split(': ')[1];
+          this.solicitudService.findAll().subscribe((solicitudes) => {
+            const solicitudReal = solicitudes.find((s) => s.numeroSolicitud === codigoSolicitud);
             if (solicitudReal) {
-              // Inyectamos la solicitud encontrada en el pedido local
-              this.pedidoService.pedidos.update(lista =>
-                lista.map(p => p.idPedido === id ? { ...p, solicitud: solicitudReal } : p)
+              this.pedidoService.pedidos.update((lista) =>
+                lista.map((p) => (p.idPedido === id ? { ...p, solicitud: solicitudReal } : p)),
               );
+              this.cargarArchivoDeSolicitud(solicitudReal.id!);
             }
           });
         }
-      }
+      },
     });
   }
 
   private cargarArchivoDeSolicitud(solicitudId: number) {
+    // 1. Limpiamos el archivo anterior para que no haya confusiones
+    this.archivoExpandido.set(null);
+
     this.archivoService.obtenerArchivos().subscribe((archivos: ArchivoSolicitud[]) => {
-      const archivo = archivos.find(a => a.id_solicitud === solicitudId);
-      this.archivoExpandido.set(archivo);
-    });
-  }
-
-  private cargarDatosAdicionales(pedidoId: number) {
-    // 1. Obtenemos el pedido completo desde el servidor para traer la relación 'solicitud'
-    this.pedidoService.getPedidoById(pedidoId).subscribe(pedidoCompleto => {
-
-      // Buscamos el pedido en el signal local y le inyectamos la solicitud cargada
-      this.pedidoService.pedidos.update(lista =>
-        lista.map(p => p.idPedido === pedidoId ? { ...p, solicitud: pedidoCompleto.solicitud } : p)
+      // 2. IMPORTANTE: Verifica si tu modelo usa 'id_solicitud' o 'solicitud.id'
+      // Probamos con ambas por seguridad:
+      const archivo = archivos.find(
+        (a: any) =>
+          a.id_solicitud === solicitudId || (a.solicitud && a.solicitud.id === solicitudId),
       );
 
-      // 2. Si tiene solicitud, cargamos su archivo asociado
-      if (pedidoCompleto.solicitud?.id) {
-        this.archivoService.obtenerArchivos().subscribe((archivos: ArchivoSolicitud[]) => {
-          // Buscamos el archivo que pertenezca a esta solicitud
-          const archivo = archivos.find(a => a.id_solicitud === pedidoCompleto.solicitud?.id);
-          this.archivoExpandido.set(archivo);
-        });
+      if (archivo) {
+        this.archivoExpandido.set(archivo);
+      } else {
+        console.warn('No se encontró archivo para la solicitud ID:', solicitudId);
       }
     });
   }
 
   descargarArchivo(archivo: any) {
     if (!archivo) return;
-    // Lógica simple de descarga: asumiendo que la URL es accesible
-    window.open(`http://localhost:8080/api/archivos/download/${archivo.id}`, '_blank');
+
+    const url = `http://localhost:8080/api/archivos/download/${archivo.id}`;
+
+    this.archivoService.descargarArchivoSeguro(url).subscribe({
+      next: (blob: Blob) => {
+        // Creamos una URL temporal para el binario (Blob) recibido
+        const urlBlob = window.URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = urlBlob;
+        anchor.download = archivo.nombreArchivo; // Forzamos el nombre original
+        anchor.click();
+
+        // Limpiamos la memoria
+        window.URL.revokeObjectURL(urlBlob);
+      },
+      error: (err) => {
+        console.error('Error en la descarga:', err);
+        alert('No tienes permiso para descargar este archivo o no existe.');
+      },
+    });
   }
 
   cambiarEstado(id: number, estado: string) {
@@ -120,12 +141,14 @@ export class PedidosListaComponent implements OnInit {
   }
 
   presupuestarPedido(pedido: any) {
-    const precio = prompt(`Introduce el precio total para la solicitud personalizada del cliente ${pedido.usuario.nombre}:`);
+    const precio = prompt(
+      `Introduce el precio total para la solicitud personalizada del cliente ${pedido.usuario.nombre}:`,
+    );
 
     if (precio && !isNaN(Number(precio))) {
       const body = {
         estado: 'PRESUPUESTADO',
-        total: Number(precio)
+        total: Number(precio),
       };
 
       // CAMBIO CRUCIAL: Usar el método que acepta el objeto completo
@@ -137,9 +160,8 @@ export class PedidosListaComponent implements OnInit {
         error: (err) => {
           console.error('Error al guardar presupuesto:', err);
           alert('No se pudo guardar el presupuesto.');
-        }
+        },
       });
     }
   }
-
 }

@@ -264,10 +264,14 @@
                         <div class="mt-6">
                           @if (archivoExpandido()) {
                             <button (click)="descargarArchivo(archivoExpandido())"
-                                    class="w-full bg-slate-900 hover:bg-blue-600 text-white p-4 rounded-2xl flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg">
-                              <span class="text-lg">💾</span>
+                                    class="w-full bg-slate-900 hover:bg-blue-600 text-white p-4 rounded-2xl flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg group">
+      <span class="text-xl group-hover:animate-bounce">
+        {{ p.solicitud.tipoServicio === 'IMPRESION_3D' ? '🖨️' : '📐' }}
+      </span>
                               <div class="text-left">
-                                <span class="block text-[10px] font-black uppercase tracking-tighter opacity-70">Descargar Plano/Modelo</span>
+        <span class="block text-[10px] font-black uppercase tracking-tighter opacity-70">
+          Descargar {{ p.solicitud.tipoServicio === 'IMPRESION_3D' ? 'Pieza 3D' : 'Plano CAD' }}
+        </span>
                                 <span class="block text-xs font-bold truncate max-w-[150px]">{{ archivoExpandido().nombreArchivo }}</span>
                               </div>
                             </button>
@@ -295,16 +299,40 @@
           <!-- COLUMNA DERECHA: Dirección y Notas comunes -->
           <div class="space-y-4">
             <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
-              <h4 class="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Dirección de Envío</h4>
-              <p class="text-sm text-slate-600 font-medium">
-                {{ p.direccionEnvio || 'Pendiente de confirmación (Se definirá al pagar)' }}
-              </p>
+              <h4 class="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">
+                📍 Ubicación de Entrega
+              </h4>
+
+              @let dir = (p.direccionEnvio && p.direccionEnvio !== 'null') ? p.direccionEnvio : p.solicitud?.usuario?.direccion;
+              @let cp = (p.codigoPostalEnvio && p.codigoPostalEnvio !== 'null') ? p.codigoPostalEnvio : p.solicitud?.usuario?.codigoPostal;
+              @let ciudad = (p.ciudadEnvio && p.ciudadEnvio !== 'null') ? p.ciudadEnvio : p.solicitud?.usuario?.ciudad;
+
+              @if (dir && dir !== 'null') {
+                <div class="space-y-1">
+                  <p class="text-sm font-bold text-slate-800">{{ dir }}</p>
+                  <p class="text-xs text-slate-500 font-medium">
+                    <!-- Solo mostramos el CP si no es null -->
+                    {{ (cp && cp !== 'null') ? cp : '' }}
+                    <!-- Solo mostramos la ciudad si no es null -->
+                    {{ (ciudad && ciudad !== 'null') ? ciudad : '' }}
+                  </p>
+                  <span class="inline-block mt-2 px-2 py-1 bg-green-50 text-green-600 text-[9px] font-black rounded-md uppercase">
+        Dirección Recuperada
+      </span>
+                </div>
+              } @else {
+                <div class="py-2">
+                  <p class="text-sm text-slate-400 italic">Pendiente de confirmación</p>
+                </div>
+              }
             </div>
 
             @if (p.notaCliente) {
               <div class="bg-blue-50 p-6 rounded-[2rem] border border-blue-100">
-                <h4 class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest">Nota del Cliente / Motivo</h4>
-                <p class="text-sm text-blue-800 italic">"{{ p.notaCliente }}"</p>
+                <h4 class="text-[10px] font-black text-blue-600 uppercase mb-2 tracking-widest flex items-center gap-2">
+                  <span>💬</span> Nota del Cliente
+                </h4>
+                <p class="text-sm text-blue-800 italic leading-relaxed">"{{ p.notaCliente }}"</p>
               </div>
             }
           </div>

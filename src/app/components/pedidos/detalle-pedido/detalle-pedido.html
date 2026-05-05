@@ -1,5 +1,6 @@
 <div class="max-w-4xl mx-auto px-6 py-12">
   @if (pedido(); as p) {
+    <!-- CABECERA COMÚN -->
     <header class="mb-8 flex justify-between items-start">
       <div>
         <button routerLink="/mis-pedidos" class="text-blue-600 font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -13,46 +14,105 @@
       <div [ngClass]="{
         'bg-orange-100 text-orange-600': p.estado === 'PENDIENTE',
         'bg-blue-100 text-blue-600': p.estado === 'EN_PROCESO',
+        'bg-purple-100 text-purple-600': p.estado === 'EVALUANDO',
         'bg-green-100 text-green-600': p.estado === 'COMPLETADO'
       }" class="px-6 py-2 rounded-2xl font-black uppercase tracking-widest text-xs">
-        {{ p.estado }}
+        {{ p.estado?.replace('_', ' ') }}
       </div>
     </header>
 
     <div class="grid gap-8">
-      <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm p-8">
-        <h2 class="text-xl font-black text-slate-800 uppercase mb-6 tracking-tighter">Productos</h2>
-        <div class="divide-y divide-slate-100">
-          @for (item of p.items; track item.id) {
-            <div class="py-4 flex justify-between items-center">
-              <div class="flex gap-4 items-center">
-                <div class="w-20 h-20 bg-slate-100 rounded-2xl overflow-hidden flex items-center justify-center border border-slate-100 shadow-inner">
-                  @if (item.producto.imagenUrl) {
-                    <img [src]="item.producto.imagenUrl"
-                         [alt]="item.producto.nombreProducto"
-                         class="w-full h-full object-cover">
-                  } @else {
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Sin foto</span>
-                  }
-                </div>
 
-                <div>
-                  <p class="font-bold text-slate-800">{{ item.producto.nombreProducto }}</p>
-                  <p class="text-sm text-slate-500">Cantidad: {{ item.cantidad }}</p>
+      <!-- BLOQUE 1: PRODUCTOS PREDISEÑADOS (Solo si existen items) -->
+      @if (p.items && p.items.length > 0) {
+        <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm p-8">
+          <h2 class="text-xl font-black text-slate-800 uppercase mb-6 tracking-tighter">Productos del Catálogo</h2>
+          <div class="divide-y divide-slate-100">
+            @for (item of p.items; track item.id) {
+              <div class="py-4 flex justify-between items-center">
+                <div class="flex gap-4 items-center">
+                  <div class="w-16 h-16 bg-slate-100 rounded-xl overflow-hidden flex items-center justify-center border border-slate-50">
+                    @if (item.producto.imagenUrl) {
+                      <img [src]="item.producto.imagenUrl" [alt]="item.producto.nombreProducto" class="w-full h-full object-cover">
+                    } @else {
+                      <span class="text-[8px] font-black text-slate-400 uppercase">Sin foto</span>
+                    }
+                  </div>
+                  <div>
+                    <p class="font-bold text-slate-800">{{ item.producto.nombreProducto }}</p>
+                    <p class="text-sm text-slate-500">Cantidad: {{ item.cantidad }}</p>
+                  </div>
                 </div>
+                <p class="font-black text-slate-900">{{ item.precioUnitario * item.cantidad | currency:'EUR' }}</p>
               </div>
-              <p class="font-black text-slate-900">{{ item.precioUnitario * item.cantidad | currency:'EUR' }}</p>
-            </div>
-          }
+            }
+          </div>
         </div>
-      </div>
+      }
 
-      <!-- En detalle-pedido_2.html[cite: 36] -->
+      <!-- BLOQUE 2: SOLICITUD PERSONALIZADA (Impresión 3D / Diseño CAD) -->
+      @if (p.solicitud) {
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-[2.5rem] border border-blue-100 p-8 shadow-sm relative overflow-hidden">
+          <!-- Decoración visual -->
+          <div class="absolute top-0 right-0 p-8 opacity-10 text-6xl">
+            {{ p.solicitud.tipoServicio === 'IMPRESION_3D' ? '🖨️' : '📐' }}
+          </div>
+
+          <h2 class="text-xl font-black text-blue-900 uppercase mb-6 tracking-tighter flex items-center gap-2">
+            <span>✨</span> Proyecto Personalizado
+          </h2>
+
+          <div class="grid md:grid-cols-2 gap-8 relative z-10">
+            <div class="space-y-4">
+              <div>
+                <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Servicio Contratado</p>
+                <p class="font-bold text-slate-800 text-lg">
+                  {{ p.solicitud.tipoServicio === 'IMPRESION_3D' ? 'Impresión 3D' : 'Modelado y Diseño CAD' }}
+                </p>
+              </div>
+
+              <div>
+                <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Configuración Técnica</p>
+                <p class="text-sm font-bold text-slate-700">
+                  Material: {{ p.solicitud.material?.nombreMaterial || 'A convenir' }}<br>
+                  Acabado: {{ p.solicitud.acabado || 'Estándar' }}
+                </p>
+              </div>
+
+              <div>
+                <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Descripción del encargo</p>
+                <p class="text-sm text-slate-600 italic leading-relaxed">"{{ p.solicitud.descripcion }}"</p>
+              </div>
+            </div>
+
+            <!-- Botón de Descarga del Archivo (Si existe) -->
+            <div class="flex flex-col justify-center items-center bg-white/60 backdrop-blur-sm rounded-3xl p-6 border border-white">
+              @if (archivoSubido(); as archivo) {
+                <p class="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Documentación Adjunta</p>
+                <button (click)="descargar()"
+                        class="w-full bg-slate-900 hover:bg-blue-600 text-white p-4 rounded-2xl flex items-center justify-center gap-4 transition-all shadow-lg group">
+                  <span class="text-2xl group-hover:scale-110 transition-transform">💾</span>
+                  <div class="text-left">
+                    <p class="text-xs font-black uppercase tracking-tighter opacity-70">Descargar Archivo</p>
+                    <p class="text-sm font-bold truncate max-w-[150px]">{{ archivo.nombreArchivo }}</p>
+                  </div>
+                </button>
+              } @else {
+                <div class="text-center p-4">
+                  <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Sin archivo adjunto</p>
+                  <p class="text-[10px] text-slate-400">El diseño será gestionado por el administrador.</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- BLOQUE 3: RESUMEN ECONÓMICO Y ENVÍO -->
       <div class="grid md:grid-cols-2 gap-8">
-
-        <!-- BLOQUE RESUMEN (Precios y Gastos)[cite: 36] -->
+        <!-- Resumen de Costes -->
         <div class="bg-slate-900 text-white rounded-[2.5rem] p-8 shadow-xl">
-          <h2 class="text-xl font-black uppercase mb-6 tracking-tighter text-blue-400">Resumen</h2>
+          <h2 class="text-xl font-black uppercase mb-6 tracking-tighter text-blue-400">Resumen de Pago</h2>
           <div class="space-y-3">
             <div class="flex justify-between text-slate-400">
               <span>Subtotal</span>
@@ -62,50 +122,37 @@
               <span>Gastos de envío</span>
               <span>{{ p.gastosEnvio | currency:'EUR' }}</span>
             </div>
-            <div class="pt-4 border-t border-slate-800 flex justify-between font-black text-xl">
+            <div class="pt-4 border-t border-slate-800 flex justify-between font-black text-2xl">
               <span>TOTAL</span>
               <span class="text-blue-400">{{ p.total | currency:'EUR' }}</span>
             </div>
           </div>
         </div>
 
-        <!-- BLOQUE ENVÍO Y PAGO (Nuevos datos)[cite: 33, 36] -->
+        <!-- Detalles de Entrega -->
         <div class="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-sm">
           <h2 class="text-xl font-black text-slate-800 uppercase mb-6 tracking-tighter">Detalles de Entrega</h2>
-
-          <div class="mb-4">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Dirección de Envío</p>
-            <p class="text-slate-700 font-bold">{{ p.direccionEnvio }}</p>
-            <!-- Mostramos Localidad y CP[cite: 33] -->
-            <p class="text-slate-600">{{ p.ciudadEnvio }} {{ p.codigoPostalEnvio ? '(' + p.codigoPostalEnvio + ')' : '' }}</p>
-          </div>
-
-          <!-- Información de Pago Segura[cite: 31, 33] -->
-          @if (p.pagos && p.pagos.length > 0) {
-            <div class="mb-4 pt-4 border-t border-slate-50">
-              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Método de Pago</p>
-              <div class="flex items-center gap-2">
-                <span class="text-slate-700 font-medium">{{ p.pagos[0].metodoPago }}</span>
-                <span class="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-500 font-mono">
-            {{ p.pagos[0].detalles }}
-          </span>
+          <div class="space-y-4">
+            <div>
+              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Destino</p>
+              <p class="text-slate-700 font-bold leading-tight">{{ p.direccionEnvio || 'Dirección no especificada' }}</p>
+              <p class="text-slate-500 text-sm">{{ p.ciudadEnvio }} {{ p.codigoPostalEnvio ? '(' + p.codigoPostalEnvio + ')' : '' }}</p>
+            </div>
+            @if (p.notaCliente) {
+              <div class="pt-4 border-t border-slate-50">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Notas del pedido</p>
+                <p class="text-slate-600 text-sm italic">"{{ p.notaCliente }}"</p>
               </div>
-            </div>
-          }
-
-          @if (p.notaCliente) {
-            <div class="pt-4 border-t border-slate-50">
-              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Notas para el repartidor</p>
-              <p class="text-slate-600 text-sm italic">"{{ p.notaCliente }}"</p>
-            </div>
-          }
+            }
+          </div>
         </div>
       </div>
+
     </div>
   } @else if (error()) {
     <div class="text-center py-20 bg-red-50 rounded-[3rem] border-2 border-red-100">
       <p class="text-red-600 font-black uppercase tracking-widest">{{ error() }}</p>
-      <button routerLink="/mis-pedidos" class="mt-4 text-sm font-bold underline">Volver</button>
+      <button routerLink="/mis-pedidos" class="mt-4 text-sm font-bold underline">Volver a mis pedidos</button>
     </div>
   }
 </div>

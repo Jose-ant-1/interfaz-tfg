@@ -78,6 +78,8 @@ export class PedidoPersonalizadoComponent implements OnInit {
     return data;
   }
 
+
+
   // 3. MÉTODO DE ENVÍO ÚNICO Y UNIFICADO
   enviarSolicitud() {
     if (!this.authService.currentUser()) return;
@@ -99,28 +101,19 @@ export class PedidoPersonalizadoComponent implements OnInit {
   }
 
   private vincularArchivo(solicitudId: number) {
-    // Definimos el objeto con tipo 'any' para saltar la validación estricta
-    // que está causando el conflicto[cite: 21]
-    const archivoData: any = {
-      nombreArchivo: this.archivoSeleccionado!.name,
-      tipoArchivo: this.archivoSeleccionado!.type,
-      tamanio: Math.round(this.archivoSeleccionado!.size / 1024),
-      url: 'uploads/' + this.archivoSeleccionado!.name,
-      fechaSubida: new Date().toISOString().split('T')[0],
-      solicitud: { id: solicitudId } // Esto se mapea al @ManyToOne en Java
-    };
+    if (!this.archivoSeleccionado) return;
 
-    this.archivoService.guardarReferenciaArchivo(archivoData).subscribe({
+    this.archivoService.subirArchivoReal(this.archivoSeleccionado, solicitudId).subscribe({
       next: () => {
         this.cargando.set(false);
-        alert('¡Solicitud y archivo enviados con éxito!');
+        alert('¡Archivo STL subido correctamente!');
         this.router.navigate(['/mis-pedidos']);
       },
       error: (err) => {
-        console.error('Error al vincular archivo:', err);
+        console.error('Error al subir el archivo físico:', err);
         this.cargando.set(false);
-        alert('Se creó la solicitud pero hubo un error con el archivo.');
-      }
+        alert('Error: La solicitud se creó pero el archivo no se pudo subir.');
+      },
     });
   }
 }
