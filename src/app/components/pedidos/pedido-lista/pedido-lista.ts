@@ -60,27 +60,35 @@ export class PedidosListaComponent implements OnInit {
 
     this.pedidoService.getPedidoById(id).subscribe({
       next: (pedidoCompleto: any) => {
-        // 1. Forzamos la actualización de TODO el objeto pedido en la lista
+        // ACTUALIZACIÓN MANUAL DE LA SEÑAL (Sustituye a la función que faltaba)
         this.pedidoService.pedidos.update((lista) =>
-          lista.map((p) => (p.idPedido === id ? { ...p, ...pedidoCompleto } : p)),
+          lista.map((p) => (p.idPedido === id ? { ...p, ...pedidoCompleto } : p))
         );
 
-        // 2. Lógica para capturar la solicitud (vía relación o nota)
+        // 1. Si el objeto ya trae la solicitud vinculada
         if (pedidoCompleto.solicitud?.id) {
           this.cargarArchivoDeSolicitud(pedidoCompleto.solicitud.id);
-        } else if (pedidoCompleto.notaCliente?.includes('SOL-')) {
-          const codigoSolicitud = pedidoCompleto.notaCliente.split(': ')[1];
-          this.solicitudService.findAll().subscribe((solicitudes) => {
-            const solicitudReal = solicitudes.find((s) => s.numeroSolicitud === codigoSolicitud);
-            if (solicitudReal) {
-              this.pedidoService.pedidos.update((lista) =>
-                lista.map((p) => (p.idPedido === id ? { ...p, solicitud: solicitudReal } : p)),
-              );
-              this.cargarArchivoDeSolicitud(solicitudReal.id!);
-            }
-          });
+        }
+        // 2. Si no, la buscamos por el código SOL en el número de pedido
+        else if (pedidoCompleto.numeroPedido?.includes('SOL-')) {
+          const match = pedidoCompleto.numeroPedido.match(/SOL-\d+/);
+          if (match) {
+            const codigoSolicitud = match[0];
+
+            this.solicitudService.findAll().subscribe((solicitudes) => {
+              const solicitudReal = solicitudes.find((s) => s.numeroSolicitud === codigoSolicitud);
+              if (solicitudReal) {
+                // Actualizamos de nuevo la lista para inyectar la solicitud encontrada
+                this.pedidoService.pedidos.update((lista) =>
+                  lista.map((p) => (p.idPedido === id ? { ...p, solicitud: solicitudReal } : p))
+                );
+                if (solicitudReal.id) this.cargarArchivoDeSolicitud(solicitudReal.id);
+              }
+            });
+          }
         }
       },
+      error: (err) => console.error('Error al expandir detalles:', err)
     });
   }
 

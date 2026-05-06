@@ -23,37 +23,34 @@ export class DetallePedidoComponent implements OnInit {
   archivoSubido = signal<ArchivoSolicitud | null>(null); // Signal para el archivo[cite: 19]
   error = signal<string | null>(null);
 
+// En detalle-pedido.ts
+
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (id) {
       this.pedidoService.getPedidoById(id).subscribe({
-        // En detalle-pedido.ts dentro del subscribe de getPedidoById
-
-        next: (data) => {
+        next: (data: any) => {
           this.pedido.set(data);
 
-          // Extraemos el código SOL del número de pedido (ej: "PED-SOL-177...")
-          const numPedido = data.numeroPedido || '';
-          const matchSolicitud = numPedido.match(/SOL-\d+/);
+          // --- LÓGICA CORREGIDA PARA ENCONTRAR EL ARCHIVO ---
 
-          if (matchSolicitud) {
-            const codigoABuscar = matchSolicitud[0];
-
-            this.solicitudService.findAll().subscribe((solicitudes) => {
-              // Búsqueda precisa por CÓDIGO DE SOLICITUD, no por usuario
-              const encontrada = solicitudes.find((s) => s.numeroSolicitud === codigoABuscar);
-
-              if (encontrada) {
-                const p = this.pedido();
-                if (p) {
-                  p.solicitud = encontrada; // Ahora sí es la ID 17 y no la 2
-                  this.pedido.set({ ...p });
-                  if (encontrada.id) this.cargarArchivo(encontrada.id);
-                }
-              }
-            });
+          // 1. Si el objeto ya trae la solicitud (relación directa)
+          if (data.solicitud?.id) {
+            this.cargarArchivo(data.solicitud.id);
+          }
+          // 2. Si no, extraemos el SOL- del número de pedido (ej: "PED-SOL-12345")
+          else if (data.numeroPedido?.includes('SOL-')) {
+            const match = data.numeroPedido.match(/SOL-\d+/);
+            if (match) {
+              const numeroSolicitud = match[0];
+              this.buscarSolicitudPorNumero(numeroSolicitud);
+            }
           }
         },
+        error: (err) => {
+          this.error.set("No se pudo cargar el detalle del pedido.");
+          console.error(err);
+        }
       });
     }
   }
@@ -74,9 +71,22 @@ export class DetallePedidoComponent implements OnInit {
   }
 
   private cargarArchivo(solicitudId: number) {
-    this.archivoService.obtenerArchivos().subscribe((archivos) => {
-      const archivo = archivos.find((a) => a.id_solicitud === solicitudId);
-      if (archivo) this.archivoSubido.set(archivo);
+    this.archivoService.obtenerArchivos().subscribe({
+      next: (archivos) => {
+        // Buscamos el archivo comprobando múltiples posibles nombres de campo
+        const archivo = archivos.find((a: any) =>
+          a.id_solicitud === solicitudId ||
+          a.solicitudId === solicitudId ||
+          (a.solicitud && a.solicitud.id === solicitudId)
+        );
+
+        if (archivo) {
+          this.archivoSubido.set(archivo);
+        } else {
+          console.warn("No se encontró ningún archivo para la solicitud:", solicitudId);
+        }
+      },
+      error: (err) => console.error("Error al obtener archivos:", err)
     });
   }
 
