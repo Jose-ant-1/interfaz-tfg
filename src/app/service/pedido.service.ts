@@ -47,8 +47,12 @@ export class PedidoService {
     return this.http.post(`${this.apiUrl}/${id}/confirmar-pago`, {});
   }
 
-  actualizarEstadoConPrecio(id: number, datos: {estado: string, total: number}) {
+  actualizarEstadoConPrecio(id: number, datos: { estado: string; total: number }) {
     return this.http.patch(`${this.apiUrl}/${id}/estado`, datos);
   }
 
+  actualizarDatosEnvio(id: number, datos: any): Observable<any> {
+    // Usamos patch porque solo vamos a actualizar unos pocos campos del pedido
+    return this.http.patch(`${this.apiUrl}/${id}/actualizar-envio`, datos);
+  }
 }

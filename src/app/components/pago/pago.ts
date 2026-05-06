@@ -168,13 +168,16 @@ export class PagoComponent implements OnInit {
 
     // --- BIFURCACIÓN DE LÓGICA ---
 
+
+// En src/app/components/pago/pago.ts
+
     if (this.esPedidoPersonalizado() && this.pedidoIdRecuperado()) {
       const idPedido = this.pedidoIdRecuperado()!;
       const importe = this.totalAMostrar();
       const numTarjetaStr = this.numeroTarjeta().replace(/\s/g, '');
       const ultimos4 = numTarjetaStr.slice(-4);
 
-      // 1. Preparamos el objeto de pago con todos los detalles
+      // SOLUCIÓN ERROR 'pagoData': Definimos el objeto antes de enviarlo
       const pagoData: Pago = {
         pedido: { idPedido: idPedido },
         importe: importe,
@@ -184,28 +187,42 @@ export class PagoComponent implements OnInit {
         detalles: `Visa/MC Personalizado **** ${ultimos4}`
       };
 
-      // 2. Procesamos el pago simulado[cite: 34]
-      this.pagoService.procesarPagoSimulado(pagoData).subscribe({
+      // Preparamos los datos de envío y la nota combinada
+      const datosEnvioActualizados = {
+        direccionEnvio: this.datosEnvio.direccion,
+        ciudadEnvio: this.datosEnvio.ciudad,
+        codigoPostalEnvio: this.datosEnvio.codigoPostal,
+        notaCliente: this.datosEnvio.nota,
+      };
+
+      // 1. Guardamos los datos de envío primero
+      this.pedidoService.actualizarDatosEnvio(idPedido, datosEnvioActualizados).subscribe({
         next: () => {
-          // 3. CAMBIO CLAVE: Usamos confirmarPagoPedido para evitar el 403[cite: 28, 29]
-          // Este método internamente en el backend pasará el pedido de 'PRESUPUESTADO' a 'PENDIENTE'
-          this.pedidoService.confirmarPagoPedido(idPedido).subscribe({
+          // 2. Si se guardó la dirección, procesamos el pago
+          this.pagoService.procesarPagoSimulado(pagoData).subscribe({
             next: () => {
-              // No necesitamos limpiar carrito aquí porque es personalizado[cite: 34]
-              alert('Pago realizado con éxito. Tu pedido ya está en cola de preparación.');
-              this.router.navigate(['/mis-pedidos']);
+              // 3. Finalmente confirmamos el pedido
+              this.pedidoService.confirmarPagoPedido(idPedido).subscribe({
+                next: () => {
+                  alert('Pago realizado con éxito. Dirección y notas guardadas.');
+                  this.router.navigate(['/mis-pedidos']);
+                },
+                error: (err) => {
+                  this.cargando.set(false);
+                  console.error('Error al confirmar pago:', err);
+                }
+              });
             },
             error: (err) => {
-              this.cargando.set(false); // Liberamos el botón si falla[cite: 34]
-              console.error('Error al activar el pedido tras pago:', err);
-              alert('El pago se procesó, pero hubo un error al actualizar el pedido. Contacta con soporte.');
+              this.cargando.set(false);
+              console.error('Error en pasarela:', err);
             }
           });
         },
         error: (err) => {
-          this.cargando.set(false); // Importante: restaurar estado si el pago falla[cite: 34]
-          console.error('Error en la pasarela de pago:', err);
-          alert('La transacción ha sido rechazada. Revisa los datos de tu tarjeta.');
+          this.cargando.set(false);
+          alert('Error al guardar los datos de envío. Inténtalo de nuevo.');
+          console.error('Error actualizando envío:', err);
         }
       });
     } else {

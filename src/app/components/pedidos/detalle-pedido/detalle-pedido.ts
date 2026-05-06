@@ -27,14 +27,31 @@ export class DetallePedidoComponent implements OnInit {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (id) {
       this.pedidoService.getPedidoById(id).subscribe({
+        // En detalle-pedido.ts dentro del subscribe de getPedidoById
+
         next: (data) => {
           this.pedido.set(data);
 
-          // LÓGICA SIN CAMBIAR EL MODELO:
-          // Si no hay solicitud directa, la buscamos en la nota del cliente
-          if (!data.solicitud && data.notaCliente?.includes('SOL-')) {
-            const numeroSolicitud = data.notaCliente.split(': ')[1]; // Extrae "SOL-123..."
-            this.buscarSolicitudPorNumero(numeroSolicitud);
+          // Extraemos el código SOL del número de pedido (ej: "PED-SOL-177...")
+          const numPedido = data.numeroPedido || '';
+          const matchSolicitud = numPedido.match(/SOL-\d+/);
+
+          if (matchSolicitud) {
+            const codigoABuscar = matchSolicitud[0];
+
+            this.solicitudService.findAll().subscribe((solicitudes) => {
+              // Búsqueda precisa por CÓDIGO DE SOLICITUD, no por usuario
+              const encontrada = solicitudes.find((s) => s.numeroSolicitud === codigoABuscar);
+
+              if (encontrada) {
+                const p = this.pedido();
+                if (p) {
+                  p.solicitud = encontrada; // Ahora sí es la ID 17 y no la 2
+                  this.pedido.set({ ...p });
+                  if (encontrada.id) this.cargarArchivo(encontrada.id);
+                }
+              }
+            });
           }
         },
       });
