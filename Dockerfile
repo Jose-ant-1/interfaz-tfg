@@ -13,7 +13,7 @@ FROM nginx:alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copiamos el contenido de la carpeta dist (prueba con y sin /browser al final)
-COPY --from=build /app/dist/interfaz-tfg /usr/share/nginx/html
+COPY --from=build /app/dist/interfaz-tfg/browser /usr/share/nginx/html
 
 # Copiamos tu configuración de Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
