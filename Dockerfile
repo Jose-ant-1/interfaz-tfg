@@ -8,8 +8,15 @@ RUN npm run build --configuration=production
 
 # Etapa 2: Servir con Nginx
 FROM nginx:alpine
-# IMPORTANTE: He puesto la ruta que te salió en la terminal (dist/interfaz-tfg)
+
+# Eliminamos la página por defecto de Nginx para que no estorbe
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copiamos el contenido de la carpeta dist (prueba con y sin /browser al final)
 COPY --from=build /app/dist/interfaz-tfg /usr/share/nginx/html
+
+# Copiamos tu configuración de Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
