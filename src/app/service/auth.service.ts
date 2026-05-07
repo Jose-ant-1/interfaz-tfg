@@ -8,7 +8,7 @@ import {CarritoService} from './carrito.service';
 export class AuthService {
   private http = inject(HttpClient);
   private injector = inject(Injector);
-  private readonly AUTH_URL = 'http://localhost:8080/api/auth';
+  private readonly AUTH_URL = '/api/auth';
   currentUser = signal<LoginResponse | null>(null);
 
   constructor() {
