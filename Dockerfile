@@ -9,13 +9,14 @@ RUN npm run build --configuration=production
 # Etapa 2: Servir con Nginx
 FROM nginx:alpine
 
-# Eliminamos la página por defecto de Nginx para que no estorbe
+# 1. Limpiamos TODA la carpeta para borrar el index.html de "Welcome to nginx"
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copiamos el contenido de la carpeta dist (prueba con y sin /browser al final)
-COPY --from=build /app/dist/interfaz-tfg/browser /usr/share/nginx/html
+# 2. Copiamos el contenido de /browser DIRECTAMENTE a la raíz de html
+# Fíjate en el punto al final: copia lo de ADENTRO de browser, no la carpeta browser
+COPY --from=build /app/dist/interfaz-tfg/browser/ /usr/share/nginx/html/
 
-# Copiamos tu configuración de Nginx
+# 3. Copiamos tu configuración de Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
