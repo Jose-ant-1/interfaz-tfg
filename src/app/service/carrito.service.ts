@@ -2,6 +2,7 @@ import {Injectable, signal, computed, inject, effect} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CarritoModel } from '../models/carrito.model';
 import { AuthService } from './auth.service';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +10,7 @@ import { AuthService } from './auth.service';
 export class CarritoService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
-  private API_URL = 'http://localhost:8080/api/carrito';
+  private API_URL = `${environment.apiUrl}/carrito`;
 
   private _items = signal<CarritoModel[]>([]);
   public items = this._items.asReadonly();

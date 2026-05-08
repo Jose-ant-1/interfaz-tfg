@@ -3,12 +3,13 @@ import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs';
 import {LoginResponse} from '../models/auth.model';
 import {CarritoService} from './carrito.service';
+import {environment} from '../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
   private injector = inject(Injector);
-  private readonly AUTH_URL = '/api/auth';
+  private readonly AUTH_URL = `${environment.apiUrl}/auth`;
   currentUser = signal<LoginResponse | null>(null);
 
   constructor() {

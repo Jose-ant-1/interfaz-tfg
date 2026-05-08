@@ -2,13 +2,14 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Usuario } from '../models/usuario.model';
 import {Observable} from 'rxjs';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UsuarioService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/usuarios';
+  private apiUrl = `${environment.apiUrl}/usuarios`;
 
   usuarios = signal<Usuario[]>([]);
 
@@ -47,5 +48,4 @@ export class UsuarioService {
   darDeBaja(id: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}/baja`, {});
   }
-
 }

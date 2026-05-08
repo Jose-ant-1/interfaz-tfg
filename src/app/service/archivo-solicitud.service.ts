@@ -3,11 +3,12 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {ArchivoSolicitud} from '../models/archivo-solicitud';
+import { environment } from '../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ArchivoService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/archivos';
+  private apiUrl = `${environment.apiUrl}/archivos`;
 
   // Cambia el tipo del parámetro aquí para que no pida una SolicitudPersonalizada
   guardarReferenciaArchivo(archivo: any): Observable<any> {

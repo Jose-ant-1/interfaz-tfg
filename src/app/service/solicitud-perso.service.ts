@@ -2,13 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SolicitudPersonalizada } from '../models/solicitud-personalizada.model';
+import { environment } from '../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SolicitudPersoService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/solicitudes';
+  private apiUrl = `${environment.apiUrl}/solicitudes`;
 
   // Obtener todas (para el Admin)
   findAll(): Observable<SolicitudPersonalizada[]> {
