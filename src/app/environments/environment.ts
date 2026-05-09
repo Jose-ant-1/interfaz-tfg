@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://filter-suggestions-pmid-hash.trycloudflare.com',
+  apiUrl: 'https://filter-suggestions-pmid-hash.trycloudflare.com/api',
 };
