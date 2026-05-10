@@ -60,8 +60,14 @@
                 {{ editando ? 'Actualizar Cambios' : 'Guardar Material' }}
               </button>
 
+              @if (errorMessage()) {
+                <p class="text-[10px] text-red-500 font-bold uppercase text-center mt-3 tracking-widest animate-pulse">
+                  {{ errorMessage() }}
+                </p>
+              }
+
               @if (editando) {
-                <button (click)="cancelarEdicion()" class="w-full text-slate-400 text-xs font-bold uppercase hover:text-red-500">
+                <button (click)="cancelarEdicion()" class="w-full text-slate-400 text-xs font-bold uppercase hover:text-red-500 mt-2">
                   Cancelar Edición
                 </button>
               }

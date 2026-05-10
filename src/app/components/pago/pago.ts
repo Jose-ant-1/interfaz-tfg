@@ -29,6 +29,7 @@ export class PagoComponent implements OnInit {
   pedidoIdRecuperado = signal<number | null>(null);
   totalAMostrar = signal(0);
   itemsAMostrar = signal<any[]>([]);
+  errorMessage = signal<string | null>(null); // Nueva señal para errores de validación
 
   // Datos de tarjeta
   numeroTarjeta = signal('');
@@ -138,25 +139,31 @@ export class PagoComponent implements OnInit {
   };
 
   async realizarPago() {
+    this.errorMessage.set(null); // Limpiar errores previos
     // 1. Validaciones Comunes (Dirección y Tarjeta) - Se mantienen intactas
     if (!this.datosEnvio.direccion || !this.datosEnvio.ciudad || !this.datosEnvio.codigoPostal) {
-      alert('Por favor, rellena todos los datos de envío (Dirección, Ciudad y CP).');
+      this.errorMessage.set('Faltan datos de envío (Dirección, Ciudad o CP).');
       return;
     }
 
     const numLimpio = this.numeroTarjeta().replace(/\s/g, '');
     if (numLimpio.length !== 16) {
-      alert('El número de tarjeta debe tener 16 dígitos.');
+      this.errorMessage.set('El número de tarjeta debe tener 16 dígitos.');
       return;
     }
 
     if (!this.isFechaValida()) {
-      alert('La tarjeta está caducada o la fecha no es válida (Formato: MM/YY).');
+      this.errorMessage.set('La tarjeta ha caducado o el formato es incorrecto (MM/YY).');
       return;
     }
 
     if (this.cvc().length < 3) {
-      alert('El código CVC debe tener 3 dígitos.');
+      this.errorMessage.set('El código CVC debe tener 3 dígitos.');
+      return;
+    }
+
+    if (this.datosEnvio.codigoPostal.length < 5) {
+      this.errorMessage.set('El Código Postal debe tener 5 dígitos numéricos.');
       return;
     }
 
@@ -270,6 +277,16 @@ export class PagoComponent implements OnInit {
         }
       });
     }
+  }
+
+  onCvcInput(event: any) {
+    const val = event.target.value.replace(/\D/g, ''); // Elimina todo lo que no sea número
+    this.cvc.set(val.substring(0, 3)); // Se asegura de que solo queden 3 dígitos
+  }
+
+  onCPInput(event: any) {
+    const val = event.target.value.replace(/\D/g, ''); // Elimina letras
+    this.datosEnvio.codigoPostal = val.substring(0, 5); // Máximo 5 dígitos
   }
 
 }

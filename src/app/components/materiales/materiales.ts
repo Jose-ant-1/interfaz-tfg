@@ -17,6 +17,7 @@ export class AdminMaterialesComponent implements OnInit {
 
   materiales = signal<Material[]>([]);
   idFilaExpandida = signal<number | null>(null);
+  errorMessage = signal<string | null>(null); // Nueva señal para el error
 
   // Objeto para el formulario
   nuevoMaterial: Material = this.resetForm();
@@ -49,40 +50,41 @@ export class AdminMaterialesComponent implements OnInit {
 
   cancelarEdicion() {
     this.editando = false;
+    this.errorMessage.set(null);
     this.nuevoMaterial = this.resetForm();
   }
 
   guardar() {
-    // Validamos que los números sean efectivamente números
-    if (!this.nuevoMaterial.nombreMaterial || this.nuevoMaterial.precioPorGramo < 0) {
-      alert('Revisa los datos obligatorios');
+    // Resetear mensaje de error al intentar guardar
+    this.errorMessage.set(null);
+
+    // Validación manual
+    if (!this.nuevoMaterial.nombreMaterial || this.nuevoMaterial.precioPorGramo <= 0) {
+      this.errorMessage.set('El nombre y un precio mayor a 0 son obligatorios.');
       return;
     }
 
-    // Creamos una copia limpia para enviar
     const datosAEnviar = {
       ...this.nuevoMaterial,
-      // Forzamos que sean números por si el input los dejó como string
       precioPorGramo: Number(this.nuevoMaterial.precioPorGramo),
       stockGramo: Number(this.nuevoMaterial.stockGramo),
     };
 
+    const observer = {
+      next: () => {
+        this.cargarMateriales();
+        this.cancelarEdicion();
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.errorMessage.set('Error al conectar con el servidor. Revisa los datos.');
+      }
+    };
+
     if (this.editando && this.nuevoMaterial.id) {
-      this.configService.updateMaterial(this.nuevoMaterial.id, datosAEnviar).subscribe({
-        next: () => {
-          this.cargarMateriales();
-          this.cancelarEdicion();
-        },
-        error: (err) => console.error('Error 400 - Verifica los campos:', err),
-      });
+      this.configService.updateMaterial(this.nuevoMaterial.id, datosAEnviar).subscribe(observer);
     } else {
-      this.configService.saveMaterial(datosAEnviar).subscribe({
-        next: () => {
-          this.cargarMateriales();
-          this.nuevoMaterial = this.resetForm();
-        },
-        error: (err) => console.error('Error 400 - Verifica los campos:', err),
-      });
+      this.configService.saveMaterial(datosAEnviar).subscribe(observer);
     }
   }
 

@@ -1,5 +1,14 @@
 <div class="max-w-7xl mx-auto px-6 py-12">
 
+  @if (mensajeFeedback()) {
+    <div class="fixed top-20 right-6 z-50 animate-fadeIn">
+      <div [ngClass]="mensajeFeedback()?.tipo === 'success' ? 'bg-emerald-500' : 'bg-red-500'"
+           class="text-white px-6 py-3 rounded-2xl shadow-2xl font-bold text-sm uppercase tracking-widest">
+        {{ mensajeFeedback()?.texto }}
+      </div>
+    </div>
+  }
+
   <header class="mb-10 flex justify-between items-end">
     <div>
       <h1 class="text-4xl font-black text-slate-900 uppercase italic tracking-tighter">Mis Pedidos</h1>
@@ -28,7 +37,7 @@
               <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total</p>
               <p class="text-sm font-black text-blue-600">{{ pedido.total | currency:'EUR' }}</p>
             </div>
-            <!-- En mis-pedidos.html -->
+
             @if (pedido.estado === 'PRESUPUESTADO') {
               <button [routerLink]="['/pago', pedido.idPedido]"
                       class="flex-1 lg:px-6 py-4 rounded-2xl bg-green-500 text-white font-black text-xs uppercase tracking-widest hover:bg-green-600 transition-all">
@@ -39,61 +48,82 @@
 
           <div class="px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter"
                [ngClass]="{
-       'bg-orange-100 text-orange-600': esEstado(pedido.estado, 'PENDIENTE'),
-       'bg-blue-100 text-blue-600': esEstado(pedido.estado, 'EN_PROCESO'),
-       'bg-green-100 text-green-600': esEstado(pedido.estado, 'ENVIADO'),
-       'bg-red-100 text-red-600 font-bold animate-pulse': esEstado(pedido.estado, 'RECLAMADO'),
-       'bg-slate-100 text-slate-600': esEstado(pedido.estado, 'CANCELADO'),
-       'bg-emerald-100 text-emerald-600': esEstado(pedido.estado, 'COMPLETADO'),
-       'bg-green-100 text-green-700': esEstado(pedido.estado, 'ENTREGADO'),
-       'bg-purple-100 text-purple-600': esEstado(pedido.estado, 'EVALUANDO'),
-       'bg-amber-100 text-amber-600': esEstado(pedido.estado, 'PRESUPUESTADO')
-     }">
+                 'bg-orange-100 text-orange-600': esEstado(pedido.estado, 'PENDIENTE'),
+                 'bg-blue-100 text-blue-600': esEstado(pedido.estado, 'EN_PROCESO'),
+                 'bg-green-100 text-green-600': esEstado(pedido.estado, 'ENVIADO'),
+                 'bg-red-100 text-red-600 font-bold animate-pulse': esEstado(pedido.estado, 'RECLAMADO'),
+                 'bg-slate-100 text-slate-600': esEstado(pedido.estado, 'CANCELADO'),
+                 'bg-emerald-100 text-emerald-600': esEstado(pedido.estado, 'COMPLETADO'),
+                 'bg-green-100 text-green-700': esEstado(pedido.estado, 'ENTREGADO'),
+                 'bg-purple-100 text-purple-600': esEstado(pedido.estado, 'EVALUANDO'),
+                 'bg-amber-100 text-amber-600': esEstado(pedido.estado, 'PRESUPUESTADO')
+               }">
             {{ pedido.estado.replace('_', ' ') }}
           </div>
         </div>
 
-        <div class="p-8 flex flex-col lg:flex-row justify-between items-center gap-8">
-          <div class="flex items-center gap-6 w-full">
-            <div class="flex -space-x-4">
-              @for (item of pedido.items?.slice(0, 3); track item.id) {
-                <div class="relative">
-                  <img [src]="item.producto.imagenUrl"
-                       class="h-20 w-20 rounded-3xl ring-8 ring-white object-cover bg-slate-100 shadow-lg"
-                       [alt]="item.producto.nombreProducto">
-                </div>
-              }
-            </div>
+        <div class="p-8">
+          <div class="flex flex-col lg:flex-row justify-between items-center gap-8">
+            <div class="flex items-center gap-6 w-full">
+              <div class="flex -space-x-4">
+                @for (item of pedido.items?.slice(0, 3); track item.id) {
+                  <div class="relative">
+                    <img [src]="item.producto.imagenUrl"
+                         class="h-20 w-20 rounded-3xl ring-8 ring-white object-cover bg-slate-100 shadow-lg"
+                         [alt]="item.producto.nombreProducto">
+                  </div>
+                }
+              </div>
 
-            <div class="flex-1">
-              <h3 class="text-lg font-bold text-slate-900 leading-tight">
-                {{ pedido.items?.[0]?.producto?.nombreProducto || 'Pedido personalizado' }}
-              </h3>
-              @if (pedido.items && pedido.items.length > 1) {
-                <p class="text-sm text-blue-500 font-bold mt-1 italic">
-                  + {{ pedido.items.length - 1 }} productos más en este envío
+              <div class="flex-1">
+                <h3 class="text-lg font-bold text-slate-900 leading-tight">
+                  {{ pedido.items?.[0]?.producto?.nombreProducto || 'Pedido personalizado' }}
+                </h3>
+                @if (pedido.items && pedido.items.length > 1) {
+                  <p class="text-sm text-blue-500 font-bold mt-1 italic">
+                    + {{ pedido.items.length - 1 }} productos más en este envío
+                  </p>
+                }
+                <p class="text-xs text-slate-400 mt-2">
+                  <span class="font-bold uppercase tracking-tighter">Entrega en:</span> {{ pedido.direccionEnvio }}
                 </p>
-              }
-              <p class="text-xs text-slate-400 mt-2">
-                <span class="font-bold uppercase tracking-tighter">Entrega en:</span> {{ pedido.direccionEnvio }}
-              </p>
+              </div>
             </div>
-          </div>
 
-          <div class="flex gap-4 w-full lg:w-auto">
             <div class="flex gap-4 w-full lg:w-auto">
-              @if (esReclamable(pedido)) {
-                <button (click)="reclamarPedido(pedido.idPedido)"
+              @if (esReclamable(pedido) && pedidoEnReclamacion() !== pedido.idPedido) {
+                <button (click)="iniciarReclamacion(pedido.idPedido)"
                         class="flex-1 lg:px-6 py-4 rounded-2xl border-2 border-red-100 text-red-500 font-black text-xs uppercase tracking-widest hover:bg-red-50 transition-all">
                   Reclamar / Incidencia
                 </button>
               }
+              <button [routerLink]="['/pedidos', pedido.idPedido]"
+                      class="flex-1 lg:px-10 py-4 rounded-2xl bg-slate-900 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 hover:bg-blue-600 transition-all active:scale-95">
+                Detalles
+              </button>
             </div>
-            <button [routerLink]="['/pedidos', pedido.idPedido]"
-                    class="flex-1 lg:px-10 py-4 rounded-2xl bg-slate-900 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 hover:bg-blue-600 transition-all active:scale-95">
-              Detalles
-            </button>
           </div>
+
+          @if (pedidoEnReclamacion() === pedido.idPedido) {
+            <div class="mt-8 pt-8 border-t border-slate-100 animate-fadeIn">
+              <div class="bg-red-50/50 p-6 rounded-3xl border border-red-100">
+                <h4 class="text-xs font-black text-red-600 uppercase tracking-widest mb-4">Indica el motivo de la reclamación</h4>
+                <textarea [(ngModel)]="motivoReclamacion"
+                          class="w-full bg-white rounded-2xl p-4 outline-none focus:ring-2 focus:ring-red-500 transition-all text-sm font-medium h-24 border border-red-100"
+                          placeholder="Ej: El producto tiene un defecto de impresión o ha llegado roto..."></textarea>
+                <div class="flex justify-end gap-3 mt-4">
+                  <button (click)="cancelarReclamacion()"
+                          class="px-5 py-2 text-xs font-bold text-slate-400 uppercase hover:text-slate-600">
+                    Cancelar
+                  </button>
+                  <button (click)="enviarReclamacion(pedido.idPedido)"
+                          class="px-8 py-3 bg-red-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-red-600 shadow-lg shadow-red-200 transition-all">
+                    Enviar Reporte
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
         </div>
       </div>
     } @empty {
