@@ -2,13 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ValoracionModel } from '../models/valoracion.model';
+import {environment} from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ValoracionService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/valoraciones';
+  private apiUrl = `${environment.apiUrl}/valoraciones`;
 
   // Obtener todas (útil para admin)
   getValoraciones(): Observable<ValoracionModel[]> {
