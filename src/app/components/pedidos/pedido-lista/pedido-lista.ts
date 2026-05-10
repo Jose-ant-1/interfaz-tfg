@@ -4,17 +4,23 @@ import { CurrencyPipe, CommonModule } from '@angular/common';
 import { SolicitudPersoService } from '../../../service/solicitud-perso.service';
 import { ArchivoService } from '../../../service/archivo-solicitud.service';
 import {ArchivoSolicitud} from '../../../models/archivo-solicitud';
+import {environment} from '../../../environments/environment';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-pedidos-lista',
   standalone: true,
-  imports: [CurrencyPipe, CommonModule],
+  imports: [CurrencyPipe, CommonModule, FormsModule],
   templateUrl: './pedido-lista.html',
 })
 export class PedidosListaComponent implements OnInit {
   public pedidoService = inject(PedidoService);
   private solicitudService = inject(SolicitudPersoService);
   private archivoService = inject(ArchivoService);
+
+  mensajeFeedback = signal<{ texto: string; tipo: 'success' | 'error' } | null>(null);
+  pedidoEnPresupuesto = signal<number | null>(null);
+  precioPresupuesto = signal<number | null>(null);
 
   idPedidoExpandido = signal<number | null>(null);
 
@@ -92,6 +98,47 @@ export class PedidosListaComponent implements OnInit {
     });
   }
 
+  iniciarPresupuesto(id: number, totalActual: number) {
+    this.pedidoEnPresupuesto.set(id);
+    this.precioPresupuesto.set(totalActual > 0 ? totalActual : null);
+  }
+
+  cancelarPresupuesto() {
+    this.pedidoEnPresupuesto.set(null);
+    this.precioPresupuesto.set(null);
+  }
+
+  confirmarPresupuesto(id: number) {
+    const precio = this.precioPresupuesto();
+
+    if (!precio || precio <= 0) {
+      this.mostrarFeedback('Introduce un precio válido mayor a 0', 'error');
+      return;
+    }
+
+    const body = {
+      estado: 'PRESUPUESTADO',
+      total: Number(precio),
+    };
+
+    this.pedidoService.actualizarEstadoConPrecio(id, body).subscribe({
+      next: () => {
+        this.mostrarFeedback('Presupuesto enviado al cliente con éxito', 'success');
+        this.pedidoEnPresupuesto.set(null);
+        this.pedidoService.obtenerTodos();
+      },
+      error: (err) => {
+        console.error(err);
+        this.mostrarFeedback('Error al guardar el presupuesto', 'error');
+      }
+    });
+  }
+
+  mostrarFeedback(texto: string, tipo: 'success' | 'error') {
+    this.mensajeFeedback.set({ texto, tipo });
+    setTimeout(() => this.mensajeFeedback.set(null), 3000);
+  }
+
   private cargarArchivoDeSolicitud(solicitudId: number) {
     // 1. Limpiamos el archivo anterior para que no haya confusiones
     this.archivoExpandido.set(null);
@@ -114,25 +161,18 @@ export class PedidosListaComponent implements OnInit {
 
   descargarArchivo(archivo: any) {
     if (!archivo) return;
-
-    const url = `http://localhost:8080/api/archivos/download/${archivo.id}`;
+    const url = `${environment.apiUrl}/archivos/download/${archivo.id}`; // Corregido el string template
 
     this.archivoService.descargarArchivoSeguro(url).subscribe({
       next: (blob: Blob) => {
-        // Creamos una URL temporal para el binario (Blob) recibido
         const urlBlob = window.URL.createObjectURL(blob);
         const anchor = document.createElement('a');
         anchor.href = urlBlob;
-        anchor.download = archivo.nombreArchivo; // Forzamos el nombre original
+        anchor.download = archivo.nombreArchivo;
         anchor.click();
-
-        // Limpiamos la memoria
         window.URL.revokeObjectURL(urlBlob);
       },
-      error: (err) => {
-        console.error('Error en la descarga:', err);
-        alert('No tienes permiso para descargar este archivo o no existe.');
-      },
+      error: () => this.mostrarFeedback('No tienes permiso o el archivo no existe', 'error')
     });
   }
 
@@ -148,28 +188,4 @@ export class PedidosListaComponent implements OnInit {
     return this.normalizarEstado(pedidoEstado) === this.normalizarEstado(estadoObjetivo);
   }
 
-  presupuestarPedido(pedido: any) {
-    const precio = prompt(
-      `Introduce el precio total para la solicitud personalizada del cliente ${pedido.usuario.nombre}:`,
-    );
-
-    if (precio && !isNaN(Number(precio))) {
-      const body = {
-        estado: 'PRESUPUESTADO',
-        total: Number(precio),
-      };
-
-      // CAMBIO CRUCIAL: Usar el método que acepta el objeto completo
-      this.pedidoService.actualizarEstadoConPrecio(pedido.idPedido, body).subscribe({
-        next: () => {
-          alert('Presupuesto enviado al cliente con éxito.');
-          this.pedidoService.obtenerTodos();
-        },
-        error: (err) => {
-          console.error('Error al guardar presupuesto:', err);
-          alert('No se pudo guardar el presupuesto.');
-        },
-      });
-    }
-  }
 }

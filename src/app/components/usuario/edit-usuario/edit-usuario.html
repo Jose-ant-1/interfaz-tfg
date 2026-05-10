@@ -1,4 +1,14 @@
 <div class="min-h-screen bg-slate-50 p-6 md:p-12">
+  @if (mensajeFeedback()) {
+    <div class="fixed top-24 right-6 z-50 animate-fadeIn">
+      <div [ngClass]="mensajeFeedback()?.tipo === 'success' ? 'bg-emerald-500' : 'bg-red-500'"
+           class="text-white px-8 py-4 rounded-2xl shadow-2xl font-bold text-sm uppercase tracking-widest flex items-center gap-3">
+        @if (mensajeFeedback()?.tipo === 'success') { <span>✅</span> } @else { <span>⚠️</span> }
+        {{ mensajeFeedback()?.texto }}
+      </div>
+    </div>
+  }
+
   <div class="max-w-3xl mx-auto">
     <div class="flex items-center justify-between mb-8">
       <h1 class="text-2xl font-black text-slate-900 uppercase italic">
@@ -61,6 +71,14 @@
               </select>
             </div>
           </div>
+
+          @if (mensajeFeedback()?.tipo === 'error') {
+            <div class="bg-red-50 p-4 rounded-xl border border-red-100 animate-pulse">
+              <p class="text-[10px] text-red-600 font-black uppercase text-center tracking-widest">
+                {{ mensajeFeedback()?.texto }}
+              </p>
+            </div>
+          }
 
           <button type="submit"
                   [disabled]="userForm.invalid"

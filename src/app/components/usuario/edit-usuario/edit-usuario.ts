@@ -17,6 +17,8 @@ export class EditUsuarioComponent implements OnInit {
   private usuarioService = inject(UsuarioService);
 
   usuario = signal<Usuario | null>(null);
+  mensajeFeedback = signal<{ texto: string; tipo: 'success' | 'error' } | null>(null);
+
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -54,25 +56,37 @@ export class EditUsuarioComponent implements OnInit {
     const u = this.usuario();
     if (!u) return;
 
-    // Validamos longitud solo si el usuario escribió algo en el campo de edición
+    this.mensajeFeedback.set(null); // Limpiar avisos previos
+
+    // Validación de contraseña
     if (u.id !== 0 && u.contrasenia && u.contrasenia.length > 0 && u.contrasenia.length < 4) {
-      alert('La nueva contraseña debe tener al menos 4 caracteres.');
+      this.mostrarFeedback('La nueva contraseña debe tener al menos 4 caracteres.', 'error');
       return;
     }
 
-    // Ahora 'actualizar' enviará el objeto con la contraseña nueva o vacía
-    // y el cambio que hicimos en el Backend (Paso 1) decidirá qué hacer.[cite: 59, 61]
     const peticion = u.id === 0 ?
       this.usuarioService.crear(u) :
       this.usuarioService.actualizar(u.id, u);
 
     peticion.subscribe({
       next: () => {
-        alert('Usuario guardado con éxito');
-        this.router.navigate(['/admin/usuarios']);
+        this.mostrarFeedback('Usuario guardado con éxito', 'success');
+        // Redirigimos tras un breve delay para que vean el mensaje
+        setTimeout(() => this.router.navigate(['/admin/usuarios']), 1500);
       },
-      error: (err) => alert('Error al guardar')
+      error: (err) => {
+        console.error(err);
+        this.mostrarFeedback('Error al guardar el usuario. Revisa los datos.', 'error');
+      }
     });
+  }
+
+  mostrarFeedback(texto: string, tipo: 'success' | 'error') {
+    this.mensajeFeedback.set({ texto, tipo });
+    // Solo ocultamos automáticamente si es un error; el éxito redirige
+    if (tipo === 'error') {
+      setTimeout(() => this.mensajeFeedback.set(null), 3000);
+    }
   }
 
 }

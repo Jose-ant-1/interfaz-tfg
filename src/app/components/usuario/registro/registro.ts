@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -21,6 +21,8 @@ export class RegistroComponent {
     telefono: '',
     contrasenia: '',
   };
+
+  mensajeError = signal<string | null>(null);
 
   formatPhone(event: any) {
     let value = event.target.value.replace(/\D/g, ''); // Elimina todo lo que no sea número
@@ -45,19 +47,20 @@ export class RegistroComponent {
   }
 
   onSubmit() {
-    // Al enviar, eliminamos los espacios para que el backend reciba solo números
+    this.mensajeError.set(null); // Limpiamos errores previos
     const telefonoLimpio = this.registroData.telefono.replace(/\s/g, '');
 
     const dataFinal = {
       nombre: this.registroData.nombre.trim(),
       apellidos: this.registroData.apellidos.trim(),
       email: this.registroData.email.trim(),
-      telefono: telefonoLimpio, // Enviamos el teléfono sin espacios
+      telefono: telefonoLimpio,
       contrasenia: this.registroData.contrasenia,
     };
 
-    if (!dataFinal.nombre || !dataFinal.apellidos || dataFinal.telefono.length !== 9) {
-      alert('Por favor, revisa que todos los campos sean correctos.');
+    // Validaciones manuales antes de enviar
+    if (dataFinal.telefono.length !== 9) {
+      this.mensajeError.set('El teléfono debe tener 9 dígitos exactos.');
       return;
     }
 
@@ -65,7 +68,11 @@ export class RegistroComponent {
       next: (response) => {
         this.router.navigate(['/login']);
       },
-      error: (err) => console.error(err)
+      error: (err) => {
+        console.error(err);
+        // Si el backend devuelve un error (ej: email ya existe), lo mostramos
+        this.mensajeError.set('No se pudo crear la cuenta. Es posible que el correo ya esté registrado.');
+      }
     });
   }
 }

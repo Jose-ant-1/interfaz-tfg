@@ -56,6 +56,14 @@
         }
       </div>
 
+      @if (mensajeError()) {
+        <div class="bg-red-50 border border-red-100 p-4 rounded-2xl animate-fadeIn">
+          <p class="text-[10px] text-red-500 font-bold uppercase text-center tracking-widest">
+            {{ mensajeError() }}
+          </p>
+        </div>
+      }
+
       <button type="submit" [disabled]="!registroForm.form.valid"
               class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-tighter shadow-xl hover:bg-blue-600 disabled:bg-slate-300 disabled:shadow-none transition-all active:scale-95 mt-4">
         Crear mi cuenta

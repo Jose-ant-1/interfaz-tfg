@@ -20,6 +20,9 @@ export class MiPerfilComponent implements OnInit {
   usuario = signal<Usuario | null>(null);
   nuevaPassword = signal<string>(''); // Nueva señal para el campo
 
+  mensajeFeedback = signal<{ texto: string; tipo: 'success' | 'error' } | null>(null);
+  confirmarCambioPassword = signal(false); // Para sustituir el confirm()
+
   ngOnInit() {
     // 1. Ahora getEmail() ya existe
     const emailSesion = this.authService.getEmail();
@@ -34,20 +37,19 @@ export class MiPerfilComponent implements OnInit {
     }
   }
 
-// En mi-perfil.component.ts[cite: 42]
   actualizarPerfil() {
     const u = this.usuario();
     if (!u) return;
 
-    // Creamos una copia para no enviar la contraseña (aunque esté vacía)
+    this.mensajeFeedback.set(null);
     const datosAActualizar = { ...u };
-    delete datosAActualizar.contrasenia; // Nos aseguramos de que no viaje este campo
+    delete datosAActualizar.contrasenia;
 
     this.usuarioService.actualizar(u.id, datosAActualizar).subscribe({
       next: () => {
-        alert('¡Perfil actualizado con éxito!');
+        this.mostrarFeedback('¡Perfil actualizado con éxito!', 'success');
       },
-      error: (err) => alert('Hubo un error al guardar los cambios'),
+      error: () => this.mostrarFeedback('Hubo un error al guardar los cambios', 'error'),
     });
   }
 
@@ -55,12 +57,14 @@ export class MiPerfilComponent implements OnInit {
     const u = this.usuario();
     if (u && u.id) {
       this.usuarioService.darDeBaja(u.id).subscribe({
-        next: (resp) => {
-          this.authService.logout();
-          alert("Se ha dado de baja correctamente");
-          this.router.navigate(['/productos']);
+        next: () => {
+          this.mostrarFeedback('Cuenta desactivada. Cerrando sesión...', 'success');
+          setTimeout(() => {
+            this.authService.logout();
+            this.router.navigate(['/productos']);
+          }, 2000);
         },
-        error: (err) => console.error("Error al dar de baja:", err)
+        error: () => this.mostrarFeedback('Error al procesar la baja', 'error')
       });
     }
   }
@@ -70,20 +74,26 @@ export class MiPerfilComponent implements OnInit {
     if (!u || !this.nuevaPassword()) return;
 
     if (this.nuevaPassword().length < 6) {
-      alert('La contraseña debe tener al menos 6 caracteres');
+      this.mostrarFeedback('La contraseña debe tener al menos 6 caracteres', 'error');
       return;
     }
 
-    if (confirm('¿Estás seguro? Se cerrará tu sesión por seguridad.')) {
-      this.usuarioService.cambiarPassword(u.id, this.nuevaPassword()).subscribe({
-        next: () => {
-          alert('Contraseña actualizada. Por favor, inicia sesión de nuevo.');
-          this.authService.logout(); // Cerramos sesión
-          // El logout ya debería redirigir a login o productos según tu lógica
-        },
-        error: () => alert('Error al cambiar la contraseña'),
-      });
-    }
+    this.usuarioService.cambiarPassword(u.id, this.nuevaPassword()).subscribe({
+      next: () => {
+        this.mostrarFeedback('Contraseña actualizada. Reiniciando sesión...', 'success');
+        // Esperamos 2 segundos para que el usuario lea el mensaje antes del logout
+        setTimeout(() => {
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        }, 2000);
+      },
+      error: () => this.mostrarFeedback('No se pudo actualizar la contraseña', 'error')
+    });
+  }
+
+  private mostrarFeedback(texto: string, tipo: 'success' | 'error') {
+    this.mensajeFeedback.set({ texto, tipo });
+    setTimeout(() => this.mensajeFeedback.set(null), 3000);
   }
 
 }

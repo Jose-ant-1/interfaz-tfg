@@ -83,7 +83,13 @@
         </div>
 
         <p class="text-[10px] text-slate-400 italic">* Las fechas de creación y actualización se generan automáticamente al guardar.</p>
-
+        @if (errorMessage()) {
+          <div class="bg-red-50 border border-red-100 p-4 rounded-xl animate-fadeIn">
+            <p class="text-xs text-red-600 font-bold uppercase tracking-widest text-center">
+              {{ errorMessage() }}
+            </p>
+          </div>
+        }
         <button type="submit" [disabled]="f.invalid" class="w-full bg-green-600 text-white py-5 rounded-2xl font-black uppercase hover:bg-slate-900 transition-all disabled:bg-slate-200">
           Guardar Producto Completo
         </button>

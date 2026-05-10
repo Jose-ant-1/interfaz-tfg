@@ -68,24 +68,6 @@ export class MisPedidosComponent implements OnInit {
     setTimeout(() => this.mensajeFeedback.set(null), 3000); // Se oculta tras 3 segundos
   }
 
-  reclamarPedido(id: number) {
-    const motivo = prompt(
-      'Por favor, indica el motivo de la reclamación (ej: producto dañado, no ha llegado...):',
-    );
-
-    if (motivo && motivo.trim().length > 0) {
-      this.pedidoService.reclamar(id, motivo).subscribe({
-        next: () => {
-          alert('Reclamación enviada con éxito');
-          this.cargarPedidos();
-        },
-        error: (err) => alert('Error al enviar la reclamación'),
-      });
-    } else if (motivo !== null) {
-      alert('Debes escribir un motivo para poder reclamar.');
-    }
-  }
-
   esEstado(pedidoEstado: string, estadoObjetivo: string): boolean {
     const normalizar = (s: string) => s?.toUpperCase().replace(/[\s_]/g, '') || '';
     return normalizar(pedidoEstado) === normalizar(estadoObjetivo);

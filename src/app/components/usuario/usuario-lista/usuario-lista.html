@@ -1,4 +1,13 @@
 <div class="min-h-screen bg-slate-50 p-8">
+  @if (mensajeFeedback()) {
+    <div class="fixed top-20 right-6 z-50 animate-fadeIn">
+      <div [ngClass]="mensajeFeedback()?.tipo === 'success' ? 'bg-emerald-500' : 'bg-red-500'"
+           class="text-white px-6 py-3 rounded-2xl shadow-2xl font-bold text-sm uppercase tracking-widest">
+        {{ mensajeFeedback()?.texto }}
+      </div>
+    </div>
+  }
+
   <div class="max-w-6xl mx-auto">
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-3xl font-black text-slate-900 tracking-tight">Gestión de Usuarios</h1>
@@ -38,12 +47,19 @@
               </td>
               <td class="p-4 text-center" (click)="$event.stopPropagation()">
                 <div class="flex justify-center gap-2">
-                  <a [routerLink]="['/admin/usuarios', u.id, 'editar']" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                  </a>
-                  <button (click) = "borrarUsuario(u.id)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                  </button>
+                  @if (idUsuarioBorrando() !== u.id) {
+                    <a [routerLink]="['/admin/usuarios', u.id, 'editar']" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </a>
+                    <button (click)="prepararBorrado(u.id)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                  } @else {
+                    <div class="flex items-center gap-1 animate-fadeIn">
+                      <button (click)="confirmarBorrado(u.id)" class="bg-red-500 text-white text-[10px] font-black px-3 py-1.5 rounded-lg uppercase">Eliminar</button>
+                      <button (click)="cancelarBorrado()" class="text-slate-400 text-[10px] font-black px-2 py-1.5 uppercase">No</button>
+                    </div>
+                  }
                 </div>
               </td>
             </tr>

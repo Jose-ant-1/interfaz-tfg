@@ -39,15 +39,24 @@ export class CrearProdPredis implements OnInit {
   materiales = signal<any[]>([]);
   tecnologias = signal<any[]>([]);
 
+  errorMessage = signal<string | null>(null);
+
   ngOnInit() {
     this.configService.getMateriales().subscribe(data => this.materiales.set(data));
     this.configService.getTecnologias().subscribe(data => this.tecnologias.set(data));
   }
 
   guardarNuevo() {
+    this.errorMessage.set(null); // Limpiamos errores previos
     const p = { ...this.producto() };
 
-    // Limpieza y conversión de tipos para el Backend
+    // Validaciones básicas antes de enviar
+    if (p.precio <= 0) {
+      this.errorMessage.set('El precio debe ser mayor a 0');
+      return;
+    }
+
+    // Conversión de tipos
     p.precio = Number(p.precio);
     p.stockDisponible = Number(p.stockDisponible);
     p.pesoGramos = Number(p.pesoGramos);
@@ -55,7 +64,10 @@ export class CrearProdPredis implements OnInit {
 
     this.prodService.crear(p).subscribe({
       next: () => this.router.navigate(['/productos']),
-      error: (err) => alert("Error al crear: " + err.message)
+      error: (err) => {
+        console.error(err);
+        this.errorMessage.set('Error al conectar con el servidor. Revisa que todos los campos obligatorios estén rellenos.');
+      }
     });
   }
 }

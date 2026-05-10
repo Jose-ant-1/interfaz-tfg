@@ -6,6 +6,7 @@ import { Pedido } from '../../../models/pedido.model';
 import { ArchivoSolicitud } from '../../../models/archivo-solicitud'; //[cite: 19]
 import { CommonModule } from '@angular/common';
 import { SolicitudPersoService } from '../../../service/solicitud-perso.service';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-detalle-pedido',
@@ -93,7 +94,7 @@ export class DetallePedidoComponent implements OnInit {
   descargar() {
     const archivo = this.archivoSubido();
     if (archivo?.id) {
-      const url = `http://localhost:8080/api/archivos/download/${archivo.id}`;
+      const url = `${environment}/archivos/download/${archivo.id}`;
       this.archivoService.descargarArchivoSeguro(url).subscribe({
         next: (blob: Blob) => {
           const urlBlob = window.URL.createObjectURL(blob);

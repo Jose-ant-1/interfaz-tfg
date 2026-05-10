@@ -7,12 +7,13 @@ import { FormsModule } from '@angular/forms';
 import { SolicitudPersonalizada } from '../../models/solicitud-personalizada.model';
 import { Material, Tecnologia } from '../../models/configuracion.model';
 import { ArchivoService } from '../../service/archivo-solicitud.service';
+import {NgClass} from '@angular/common';
 
 
 @Component({
   selector: 'app-pedido-personalizado',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, NgClass],
   templateUrl: './solicitud-personalizada.html',
 })
 export class PedidoPersonalizadoComponent implements OnInit {
@@ -26,7 +27,8 @@ export class PedidoPersonalizadoComponent implements OnInit {
   tecnologias = signal<Tecnologia[]>([]);
   cargando = signal(false);
 
-  // 1. VARIABLE ÚNICA PARA EL ARCHIVO
+  mensajeFeedback = signal<{ texto: string; tipo: 'success' | 'error' } | null>(null);
+
   archivoSeleccionado: File | null = null;
 
   solicitud: SolicitudPersonalizada = {
@@ -51,7 +53,6 @@ export class PedidoPersonalizadoComponent implements OnInit {
     }
   }
 
-  // 2. FUNCIÓN PARA PREPARAR LOS DATOS (Evita errores de TS2339)
   private prepararData(): any {
     const user = this.authService.currentUser();
 
@@ -78,25 +79,24 @@ export class PedidoPersonalizadoComponent implements OnInit {
     return data;
   }
 
-
-
-  // 3. MÉTODO DE ENVÍO ÚNICO Y UNIFICADO
   enviarSolicitud() {
     if (!this.authService.currentUser()) return;
 
     this.cargando.set(true);
+    this.mensajeFeedback.set(null); // Limpiar avisos previos
 
-    // Primero creamos la solicitud principal
     this.solicitudService.create(this.prepararData()).subscribe({
       next: (solicitudGuardada) => {
-        // Si hay archivo y es para impresión, lo vinculamos[cite: 16, 25]
         if (this.solicitud.tipoServicio === 'IMPRESION_3D' && this.archivoSeleccionado) {
           this.vincularArchivo(solicitudGuardada.id!);
         } else {
-          this.router.navigate(['/mis-pedidos']);
+          this.mostrarExitoYRedirigir('Solicitud enviada correctamente');
         }
       },
-      error: () => this.cargando.set(false),
+      error: () => {
+        this.cargando.set(false);
+        this.mensajeFeedback.set({ texto: 'Error al enviar la solicitud. Inténtalo de nuevo.', tipo: 'error' });
+      },
     });
   }
 
@@ -105,15 +105,22 @@ export class PedidoPersonalizadoComponent implements OnInit {
 
     this.archivoService.subirArchivoReal(this.archivoSeleccionado, solicitudId).subscribe({
       next: () => {
-        this.cargando.set(false);
-        alert('¡Archivo STL subido correctamente!');
-        this.router.navigate(['/mis-pedidos']);
+        this.mostrarExitoYRedirigir('Solicitud y archivo subidos con éxito');
       },
       error: (err) => {
-        console.error('Error al subir el archivo físico:', err);
+        console.error('Error al subir el archivo:', err);
         this.cargando.set(false);
-        alert('Error: La solicitud se creó pero el archivo no se pudo subir.');
+        this.mensajeFeedback.set({
+          texto: 'La solicitud se creó, pero hubo un problema con el archivo técnico.',
+          tipo: 'error'
+        });
       },
     });
+  }
+
+  private mostrarExitoYRedirigir(mensaje: string) {
+    this.cargando.set(false);
+    this.mensajeFeedback.set({ texto: mensaje, tipo: 'success' });
+    setTimeout(() => this.router.navigate(['/mis-pedidos']), 2000);
   }
 }

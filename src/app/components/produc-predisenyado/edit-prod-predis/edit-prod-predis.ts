@@ -21,6 +21,8 @@ export class EditProdPredis implements OnInit {
   materiales = signal<any[]>([]);
   tecnologias = signal<any[]>([]);
 
+  mensajeFeedback = signal<{ texto: string; tipo: 'success' | 'error' } | null>(null);
+
   ngOnInit() {
     this.configService.getMateriales().subscribe(data => this.materiales.set(data));
     this.configService.getTecnologias().subscribe(data => this.tecnologias.set(data));
@@ -41,30 +43,37 @@ export class EditProdPredis implements OnInit {
 
   guardarCambios() {
     const p = { ...this.producto() };
+    this.mensajeFeedback.set(null);
 
-    // 1. Conversión de Tipos Numéricos (Crucial para evitar Error 400)
+    // Conversión de Tipos Numéricos
     p.precio = Number(p.precio);
     p.stockDisponible = Number(p.stockDisponible);
     p.pesoGramos = Number(p.pesoGramos);
     p.tiempoImpresionMinutos = Number(p.tiempoImpresionMinutos);
 
-    // 2. Limpieza de campos que JPA genera automáticamente
     delete p.fechaCreacion;
     delete p.fechaActualizacion;
 
-    // 3. Validación de integridad de objetos
     if (p.material && !p.material.id) p.material = null;
     if (p.tecnologia && !p.tecnologia.id) p.tecnologia = null;
 
     this.prodService.actualizar(p.id, p).subscribe({
       next: () => {
-        console.log("Producto actualizado con éxito");
-        this.router.navigate(['/productos', p.id]);
+        this.mostrarFeedback('Producto actualizado correctamente', 'success');
+        // Redirigimos después de un breve delay para que vean el mensaje
+        setTimeout(() => this.router.navigate(['/productos', p.id]), 1500);
       },
       error: (err) => {
-        console.error("Error 400 o similar:", err);
-        alert("Error al guardar. Revisa la consola.");
+        console.error(err);
+        this.mostrarFeedback('Error al guardar los cambios. Revisa los datos.', 'error');
       }
     });
+  }
+
+  mostrarFeedback(texto: string, tipo: 'success' | 'error') {
+    this.mensajeFeedback.set({ texto, tipo });
+    if (tipo === 'error') {
+      setTimeout(() => this.mensajeFeedback.set(null), 3000);
+    }
   }
 }
