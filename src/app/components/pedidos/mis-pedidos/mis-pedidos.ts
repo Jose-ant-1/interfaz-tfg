@@ -59,7 +59,7 @@ export class MisPedidosComponent implements OnInit {
         this.pedidoEnReclamacion.set(null);
         this.cargarPedidos();
       },
-      error: () => this.mostrarFeedback('Error al enviar la reclamación', 'error')
+      error: () => this.mostrarFeedback('Error al enviar la reclamación', 'error'),
     });
   }
 
@@ -74,8 +74,21 @@ export class MisPedidosComponent implements OnInit {
   }
 
   esReclamable(pedido: Pedido): boolean {
+    // 1. Si ya está reclamado, no se puede volver a reclamar
     if (pedido.estado === 'RECLAMADO') return false;
+
+    // 2. Verificar que el estado sea apto para reclamación
     const estadosValidos = ['ENVIADO', 'COMPLETADO', 'ENTREGADO'];
-    return estadosValidos.includes(pedido.estado);
+    if (!estadosValidos.includes(pedido.estado)) return false;
+
+    // 3. RESTRICCIÓN TEMPORAL: Máximo 24 horas desde la creación del pedido
+    if (!pedido.fechaPedido) return false;
+
+    const fechaPedido = new Date(pedido.fechaPedido).getTime();
+    const ahora = new Date().getTime();
+    const unDiaEnMilisegundos = 24 * 60 * 60 * 1000;
+
+    // Retorna true solo si han pasado menos de 24 horas
+    return ahora - fechaPedido < unDiaEnMilisegundos;
   }
 }

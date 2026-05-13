@@ -121,9 +121,9 @@
         }
 
         @if (esEstado(p.estado, 'ENVIADO')) {
-          <button (click)="cambiarEstado(p.idPedido, 'ENTREGADO')"
+          <button (click)="cambiarEstado(p.idPedido, 'COMPLETADO')"
                   class="flex items-center gap-2 px-3 py-2 bg-green-50 text-green-600 rounded-xl hover:bg-green-600 hover:text-white transition-all text-[10px] font-black uppercase">
-            ENTREGADO
+            FINALIZAR PEDIDO
           </button>
 
           <button (click)="cambiarEstado(p.idPedido, 'RECLAMADO')"

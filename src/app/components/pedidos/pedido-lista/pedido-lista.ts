@@ -40,7 +40,8 @@ export class PedidosListaComponent implements OnInit {
         s === 'ENPROCESO' ||
         s === 'RECLAMADO' ||
         s === 'EVALUANDO' ||
-        s === 'PRESUPUESTADO'
+        s === 'PRESUPUESTADO' ||
+        s === "ENVIADO"
       );
     }),
   );
@@ -48,7 +49,7 @@ export class PedidosListaComponent implements OnInit {
   pedidosCompletados = computed(() =>
     this.pedidoService.pedidos().filter((p) => {
       const s = this.normalizarEstado(p.estado);
-      return s === 'ENVIADO' || s === 'COMPLETADO' || s === 'CANCELADO';
+      return s === 'COMPLETADO' || s === 'CANCELADO';
     }),
   );
 
