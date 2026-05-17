@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { CarritoModel } from '../models/carrito.model';
 import { AuthService } from './auth.service';
 import { environment } from '../environments/environment';
+import {forkJoin} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -23,19 +24,57 @@ export class CarritoService {
     this._items().reduce((acc, item) => acc + item.precio * item.cantidad, 0),
   );
 
+  private sincronizando = false; // Bloqueo para evitar bucles
+
   constructor() {
-    // 1. Cargar local siempre al arrancar (para anónimos)
+    // Carga inicial del local
     const localCart = localStorage.getItem('carrito_local');
     if (localCart) {
       this._items.set(JSON.parse(localCart));
     }
 
-    // 2. EFECTO REACTIVO: Se ejecutará cada vez que authService.currentUser cambie
     effect(() => {
       const usuario = this.authService.currentUser();
-      if (usuario) {
-        console.log('Detectado usuario logueado, cargando carrito del servidor...');
-        this.cargarCarritoDesdeServidor();
+      // Solo intentamos sincronizar si hay un usuario real y el storage NO está vacío
+      const rawData = localStorage.getItem('carrito_local');
+
+      if (usuario && rawData) {
+        const items = JSON.parse(rawData);
+        if (items.length > 0 && !this.sincronizando) {
+          this.sincronizarCarritoLocalAlServidor(items);
+        }
+      }
+    });
+  }
+
+  private sincronizarCarritoLocalAlServidor(itemsLocales: CarritoModel[]) {
+    if (this.sincronizando) return;
+    this.sincronizando = true;
+
+    // Vaciamos el servidor para que no sume lo anónimo a lo que ya hubiera en la cuenta
+    this.http.delete(`${this.API_URL}/limpiar`).subscribe({
+      next: () => {
+        // Una vez limpio el servidor, procedemos con la subida
+        localStorage.removeItem('carrito_local');
+        this._items.set([]);
+
+        const peticiones = itemsLocales.map(item => {
+          const pId = item.productoId || item.id;
+          return this.http.post(`${this.API_URL}/add/${pId}?cantidad=${item.cantidad}`, {});
+        });
+
+        forkJoin(peticiones).subscribe({
+          next: () => {
+            this.cargarCarritoDesdeServidor();
+          },
+          complete: () => {
+            setTimeout(() => this.sincronizando = false, 1500);
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error al limpiar antes de sincronizar', err);
+        this.sincronizando = false;
       }
     });
   }
@@ -47,13 +86,12 @@ export class CarritoService {
       // Si hay usuario, enviamos la cantidad real al servidor
       const pId = producto.productoId || producto.id;
 
-      // Tu endpoint de Spring /api/carrito/add/{id}?cantidad=X
       this.http.post(`${this.API_URL}/add/${pId}?cantidad=${cantidadSolicitada}`, {}).subscribe({
         next: () => this.cargarCarritoDesdeServidor(),
         error: (err) => console.error('Error al sincronizar cantidad:', err),
       });
     } else {
-      // Si es anónimo, la lógica de localStorage (que ya deberías tener)
+      // Si es anónimo, la lógica de localStorage
       this.actualizarEstadoLocal(producto, cantidadSolicitada);
     }
   }
@@ -126,8 +164,11 @@ export class CarritoService {
             cantidad: e.cantidad,
             imagenUrl: e.producto?.imagenUrl || 'assets/placeholder.png',
           }));
+
+          // REEMPLAZO TOTAL: No usamos update, usamos set para machacar lo viejo
           this._items.set(itemsMapeados);
-          // Opcional: mantener sincronizado el local incluso logueado
+
+          // Sincronizamos el localstorage para que coincida con la "verdad" del servidor
           localStorage.setItem('carrito_local', JSON.stringify(itemsMapeados));
         }
       },
@@ -141,11 +182,11 @@ export class CarritoService {
   limpiarCarrito() {
     const usuario = this.authService.currentUser();
 
-    // 1. Limpiamos SIEMPRE el rastro local (LocalStorage y Signal)
+    // Limpiamos SIEMPRE el rastro local (LocalStorage y Signal)
     this._items.set([]);
     localStorage.removeItem('carrito_local');
 
-    // 2. Si hay un usuario logueado, avisamos al servidor para que limpie la BD
+    // Si hay un usuario logueado, avisamos al servidor para que limpie la BD
     if (usuario) {
       this.http.delete(`${this.API_URL}/limpiar`).subscribe({
         next: () => {

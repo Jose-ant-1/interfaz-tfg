@@ -17,9 +17,8 @@ export class AdminMaterialesComponent implements OnInit {
 
   materiales = signal<Material[]>([]);
   idFilaExpandida = signal<number | null>(null);
-  errorMessage = signal<string | null>(null); // Nueva señal para el error
+  errorMessage = signal<string | null>(null);
 
-  // Objeto para el formulario
   nuevoMaterial: Material = this.resetForm();
   editando = false; // Flag para saber si estamos editando
 

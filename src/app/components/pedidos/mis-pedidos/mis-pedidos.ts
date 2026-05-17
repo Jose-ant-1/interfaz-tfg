@@ -74,14 +74,14 @@ export class MisPedidosComponent implements OnInit {
   }
 
   esReclamable(pedido: Pedido): boolean {
-    // 1. Si ya está reclamado, no se puede volver a reclamar
+    // Si ya está reclamado, no se puede volver a reclamar
     if (pedido.estado === 'RECLAMADO') return false;
 
-    // 2. Verificar que el estado sea apto para reclamación
+    // Verificar que el estado sea apto para reclamación
     const estadosValidos = ['ENVIADO', 'COMPLETADO', 'ENTREGADO'];
     if (!estadosValidos.includes(pedido.estado)) return false;
 
-    // 3. RESTRICCIÓN TEMPORAL: Máximo 24 horas desde la creación del pedido
+    // RESTRICCIÓN TEMPORAL: Máximo 24 horas desde la creación del pedido
     if (!pedido.fechaPedido) return false;
 
     const fechaPedido = new Date(pedido.fechaPedido).getTime();

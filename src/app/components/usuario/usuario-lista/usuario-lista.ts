@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core'; // Añadido signal
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { UsuarioService } from '../../../service/usuario.service';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -9,13 +9,12 @@ import { RouterLink } from '@angular/router';
   imports: [CommonModule, RouterLink],
   templateUrl: './usuario-lista.html',
 })
-// ... otras importaciones
+
 export class UsuarioListaComponent implements OnInit {
   public usuarioService = inject(UsuarioService);
 
   idUsuarioExpandido = signal<number | null>(null);
 
-  // Nuevas señales para feedback y confirmación segura
   mensajeFeedback = signal<{ texto: string; tipo: 'success' | 'error' } | null>(null);
   idUsuarioBorrando = signal<number | null>(null);
 

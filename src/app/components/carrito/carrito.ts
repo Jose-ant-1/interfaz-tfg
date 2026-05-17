@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { CarritoService } from '../../service/carrito.service';
-import { RouterLink, Router } from '@angular/router'; // <-- Añadido Router
-import { ProdPredService } from '../../service/prod.predis.service'; // <-- Asegúrate de que la ruta es correcta
+import { RouterLink, Router } from '@angular/router';
+import { ProdPredService } from '../../service/prod.predis.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -25,14 +25,14 @@ export class CarritoComponent {
 
   aumentar(item: any) {
     this.carritoService.agregarProducto(item, 1);
-    this.erroresStock.set([]); // Limpiamos errores si el usuario cambia algo
+    this.erroresStock.set([]);
   }
 
   reducir(item: any) {
     const idProducto = item.productoId || item.id;
     if (idProducto) {
       this.carritoService.decrementarProducto(idProducto);
-      this.erroresStock.set([]); // Limpiamos errores si el usuario cambia algo
+      this.erroresStock.set([]);
     }
   }
 
@@ -44,10 +44,9 @@ export class CarritoComponent {
     this.erroresStock.set([]);
 
     // Preparamos las llamadas al servidor para comprobar el stock de cada producto
-    // NOTA: Usa el método exacto que tengas en ProdPredService para buscar por ID
     const validacionesStock = carritoActual.map(item => {
       const idReal = item.productoId || item.id;
-      return this.prodService.obtenerPorId(idReal).pipe( // <-- Cámbialo si tu método se llama distinto (ej. getProductoPorId)
+      return this.prodService.obtenerPorId(idReal).pipe(
         catchError(() => of(null)) // Si falla uno, devolvemos null para no romper el forkJoin
       );
     });

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core'; // Añadido signal
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../service/auth.service';
 import { CarritoService } from '../../service/carrito.service';

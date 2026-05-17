@@ -27,8 +27,7 @@ export class EditUsuarioComponent implements OnInit {
       // MODO EDICIÓN
       this.usuarioService.obtenerPorId(+id).subscribe({
         next: (data) => {
-          // IMPORTANTE: Limpiamos la contraseña del objeto local
-          // para que el input empiece vacío y no enviemos el hash actual.
+          // Limpiamos la contraseña del objeto local
           data.contrasenia = '';
           this.usuario.set(data);
         },
@@ -37,11 +36,11 @@ export class EditUsuarioComponent implements OnInit {
     } else {
       // MODO CREACIÓN: Inicializamos con valores por defecto
       this.usuario.set({
-        id: 0, // Importante: ID 0 para que Jackson no de error
+        id: 0, // ID 0 para que Jackson no de error
         email: '',
         nombre: '',
         apellidos: '',
-        contrasenia: '', // ¡Necesario para el POST!
+        contrasenia: '',
         telefono: '',
         direccion: '',
         ciudad: '',
@@ -56,7 +55,7 @@ export class EditUsuarioComponent implements OnInit {
     const u = this.usuario();
     if (!u) return;
 
-    this.mensajeFeedback.set(null); // Limpiar avisos previos
+    this.mensajeFeedback.set(null);
 
     // Validación de contraseña
     if (u.id !== 0 && u.contrasenia && u.contrasenia.length > 0 && u.contrasenia.length < 4) {

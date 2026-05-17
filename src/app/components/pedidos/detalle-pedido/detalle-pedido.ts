@@ -1,9 +1,9 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { PedidoService } from '../../../service/pedido.service';
-import { ArchivoService } from '../../../service/archivo-solicitud.service'; //
+import { ArchivoService } from '../../../service/archivo-solicitud.service';
 import { Pedido } from '../../../models/pedido.model';
-import { ArchivoSolicitud } from '../../../models/archivo-solicitud'; //[cite: 19]
+import { ArchivoSolicitud } from '../../../models/archivo-solicitud';
 import { CommonModule } from '@angular/common';
 import { SolicitudPersoService } from '../../../service/solicitud-perso.service';
 import {environment} from '../../../environments/environment';
@@ -17,14 +17,12 @@ import {environment} from '../../../environments/environment';
 export class DetallePedidoComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private pedidoService = inject(PedidoService);
-  private archivoService = inject(ArchivoService); //[cite: 18]
+  private archivoService = inject(ArchivoService);
   private solicitudService = inject(SolicitudPersoService);
 
   pedido = signal<Pedido | null>(null);
-  archivoSubido = signal<ArchivoSolicitud | null>(null); // Signal para el archivo[cite: 19]
+  archivoSubido = signal<ArchivoSolicitud | null>(null);
   error = signal<string | null>(null);
-
-// En detalle-pedido.ts
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -35,11 +33,11 @@ export class DetallePedidoComponent implements OnInit {
 
           // --- LÓGICA CORREGIDA PARA ENCONTRAR EL ARCHIVO ---
 
-          // 1. Si el objeto ya trae la solicitud (relación directa)
+          // Si el objeto ya trae la solicitud
           if (data.solicitud?.id) {
             this.cargarArchivo(data.solicitud.id);
           }
-          // 2. Si no, extraemos el SOL- del número de pedido (ej: "PED-SOL-12345")
+          // Si no, extraemos el SOL- del número de pedido (ej: "PED-SOL-12345")
           else if (data.numeroPedido?.includes('SOL-')) {
             const match = data.numeroPedido.match(/SOL-\d+/);
             if (match) {

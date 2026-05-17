@@ -18,18 +18,15 @@ export class MiPerfilComponent implements OnInit {
   private router = inject(Router);
 
   usuario = signal<Usuario | null>(null);
-  nuevaPassword = signal<string>(''); // Nueva señal para el campo
+  nuevaPassword = signal<string>('');
 
   mensajeFeedback = signal<{ texto: string; tipo: 'success' | 'error' } | null>(null);
-  confirmarCambioPassword = signal(false); // Para sustituir el confirm()
 
   ngOnInit() {
-    // 1. Ahora getEmail() ya existe
     const emailSesion = this.authService.getEmail();
 
     if (emailSesion) {
-      // 2. Ahora llamamos al nuevo método obtenerPorEmail
-      // 3. Tipamos (data: Usuario) y (err: any) para evitar errores de compilación
+      // Tipamos (data: Usuario) y (err: any) para evitar errores de compilación
       this.usuarioService.obtenerPorEmail(emailSesion).subscribe({
         next: (data: Usuario) => this.usuario.set(data),
         error: (err: any) => console.error('Error al cargar perfil', err),

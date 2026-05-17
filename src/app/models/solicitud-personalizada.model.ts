@@ -1,5 +1,5 @@
 import { Material, Tecnologia } from './configuracion.model';
-import { Usuario } from './usuario.model'; // Asumiendo que tienes este modelo
+import { Usuario } from './usuario.model';
 
 export interface SolicitudPersonalizada {
   id?: number;
@@ -11,7 +11,7 @@ export interface SolicitudPersonalizada {
   descripcion: string;
   requisitosEspeciales?: string;
   acabado?: string;
-  estado: string; // 'EVALUANDO', 'PRESUPUESTADO', etc.
+  estado: string;
   fechaSolicitud?: string;
   fechaActualizacion?: string;
   precio?: number;

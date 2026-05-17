@@ -31,9 +31,7 @@ export class UsuarioService {
     return this.http.put(`${this.apiUrl}/${id}`, usuario);
   }
 
-  // Dentro de la clase UsuarioService en usuario.service.ts
   obtenerPorEmail(email: string) {
-    // Asegúrate de que tu backend tenga este endpoint (GET /api/usuarios/email/{email})
     return this.http.get<Usuario>(`${this.apiUrl}/email/${email}`);
   }
 

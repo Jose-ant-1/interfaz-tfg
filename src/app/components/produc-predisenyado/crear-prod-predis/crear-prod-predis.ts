@@ -17,7 +17,6 @@ export class CrearProdPredis implements OnInit {
   private prodService = inject(ProdPredService);
   private configService = inject(AdminConfigService);
 
-  // Los 16 campos inicializados
   producto = signal<Producto>({
     nombreProducto: '',
     descripcion: '',

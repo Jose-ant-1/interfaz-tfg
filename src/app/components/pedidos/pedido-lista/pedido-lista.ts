@@ -34,7 +34,6 @@ export class PedidosListaComponent implements OnInit {
   pedidosPendientes = computed(() =>
     this.pedidoService.pedidos().filter((p) => {
       const s = this.normalizarEstado(p.estado);
-      // Añadimos EVALUANDO y PRESUPUESTADO a la lista de gestión activa
       return (
         s === 'PENDIENTE' ||
         s === 'ENPROCESO' ||
@@ -67,16 +66,15 @@ export class PedidosListaComponent implements OnInit {
 
     this.pedidoService.getPedidoById(id).subscribe({
       next: (pedidoCompleto: any) => {
-        // ACTUALIZACIÓN MANUAL DE LA SEÑAL (Sustituye a la función que faltaba)
         this.pedidoService.pedidos.update((lista) =>
           lista.map((p) => (p.idPedido === id ? { ...p, ...pedidoCompleto } : p))
         );
 
-        // 1. Si el objeto ya trae la solicitud vinculada
+        // Si el objeto ya trae la solicitud vinculada
         if (pedidoCompleto.solicitud?.id) {
           this.cargarArchivoDeSolicitud(pedidoCompleto.solicitud.id);
         }
-        // 2. Si no, la buscamos por el código SOL en el número de pedido
+        // Si no, la buscamos por el código SOL en el número de pedido
         else if (pedidoCompleto.numeroPedido?.includes('SOL-')) {
           const match = pedidoCompleto.numeroPedido.match(/SOL-\d+/);
           if (match) {
@@ -141,12 +139,10 @@ export class PedidosListaComponent implements OnInit {
   }
 
   private cargarArchivoDeSolicitud(solicitudId: number) {
-    // 1. Limpiamos el archivo anterior para que no haya confusiones
+    // Limpiamos el archivo anterior para que no haya confusiones
     this.archivoExpandido.set(null);
 
     this.archivoService.obtenerArchivos().subscribe((archivos: ArchivoSolicitud[]) => {
-      // 2. IMPORTANTE: Verifica si tu modelo usa 'id_solicitud' o 'solicitud.id'
-      // Probamos con ambas por seguridad:
       const archivo = archivos.find(
         (a: any) =>
           a.id_solicitud === solicitudId || (a.solicitud && a.solicitud.id === solicitudId),
@@ -162,7 +158,7 @@ export class PedidosListaComponent implements OnInit {
 
   descargarArchivo(archivo: any) {
     if (!archivo) return;
-    const url = `${environment.apiUrl}/archivos/download/${archivo.id}`; // Corregido el string template
+    const url = `${environment.apiUrl}/archivos/download/${archivo.id}`;
 
     this.archivoService.descargarArchivoSeguro(url).subscribe({
       next: (blob: Blob) => {
@@ -184,7 +180,6 @@ export class PedidosListaComponent implements OnInit {
     });
   }
 
-  // Nueva función para usar en el HTML y que los botones no fallen por un "_"
   esEstado(pedidoEstado: string, estadoObjetivo: string): boolean {
     return this.normalizarEstado(pedidoEstado) === this.normalizarEstado(estadoObjetivo);
   }

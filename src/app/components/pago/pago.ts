@@ -22,7 +22,7 @@ export class PagoComponent implements OnInit {
   private pagoService = inject(PagoService);
   private pedidoService = inject(PedidoService);
   private usuarioService = inject(UsuarioService);
-  private authService = inject(AuthService); // Necesitas el servicio donde guardes el email al hacer login
+  private authService = inject(AuthService);
   private router = inject(Router);
 
   esPedidoPersonalizado = signal(false);
@@ -33,19 +33,19 @@ export class PagoComponent implements OnInit {
 
   // Datos de tarjeta
   numeroTarjeta = signal('');
-  fechaExpiracion = signal(''); // Formato MM/YY
+  fechaExpiracion = signal('');
   cvc = signal('');
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
 
     if (id) {
-      // ESCENARIO A: Pedido Personalizado
+      // Pedido Personalizado
       this.esPedidoPersonalizado.set(true);
       this.pedidoIdRecuperado.set(+id);
       this.cargarPedidoPersonalizado(+id);
     } else {
-      // ESCENARIO B: Flujo normal de Carrito[cite: 30]
+      // Flujo normal de Carrito
       this.totalAMostrar.set(this.carritoService.precioTotal());
       this.itemsAMostrar.set(this.carritoItems());
     }
@@ -54,7 +54,7 @@ export class PagoComponent implements OnInit {
     const email = this.authService.getEmail();
 
     if (email) {
-      // Usamos el método obtenerPorEmail que ya tienes definido
+      // Usamos el método obtenerPorEmail que ya hay
       this.usuarioService.obtenerPorEmail(email).subscribe({
         next: (user) => {
           if (user) {
@@ -83,7 +83,7 @@ export class PagoComponent implements OnInit {
     });
   }
 
-  // Formatear número de tarjeta: Bloques de 4
+  // Formatear número de tarjeta en Bloques de 4
   onNumeroTarjetaInput(event: any) {
     let val = event.target.value.replace(/\D/g, ''); // Solo números
     if (val.length > 16) val = val.substring(0, 16);
@@ -104,7 +104,7 @@ export class PagoComponent implements OnInit {
     this.fechaExpiracion.set(val);
   }
 
-  // Validar si la fecha es futura
+  // Validar fecha
   isFechaValida(): boolean {
     const fecha = this.fechaExpiracion();
     if (!fecha || !fecha.includes('/')) return false;
@@ -113,15 +113,14 @@ export class PagoComponent implements OnInit {
     if (!month || !yearStr || month > 12 || month < 1) return false;
 
     const now = new Date();
-    const currentMonth = now.getMonth() + 1; // getMonth() va de 0 a 11
+    const currentMonth = now.getMonth() + 1;
     // Obtenemos los últimos 2 dígitos del año actual (ej: 2024 -> 24)
     const currentYear = parseInt(now.getFullYear().toString().slice(-2));
 
     // Si el año es menor al actual, no es válida
     if (yearStr < currentYear) return false;
 
-    // Si es el mismo año pero el mes ya pasó o es el actual (dependiendo de tu política,
-    // normalmente las tarjetas valen hasta el último día del mes impreso)
+    // Si es el mismo año pero el mes ya pasó o es el actual, si es actual lo pasamos
     return !(yearStr === currentYear && month < currentMonth);
 
   }
@@ -140,7 +139,7 @@ export class PagoComponent implements OnInit {
 
   async realizarPago() {
     this.errorMessage.set(null); // Limpiar errores previos
-    // 1. Validaciones Comunes (Dirección y Tarjeta) - Se mantienen intactas
+    // Validaciones Comunes (Dirección y Tarjeta)
     if (!this.datosEnvio.direccion || !this.datosEnvio.ciudad || !this.datosEnvio.codigoPostal) {
       this.errorMessage.set('Faltan datos de envío (Dirección, Ciudad o CP).');
       return;
@@ -169,14 +168,9 @@ export class PagoComponent implements OnInit {
 
     this.cargando.set(true);
 
-    // 2. Preparación de datos comunes para el Pago
+    // Preparación de datos comunes para el Pago
     const numTarjetaStr = this.numeroTarjeta().replace(/\s/g, '');
     const ultimos4 = numTarjetaStr.slice(-4);
-
-    // --- BIFURCACIÓN DE LÓGICA ---
-
-
-// En src/app/components/pago/pago.ts
 
     if (this.esPedidoPersonalizado() && this.pedidoIdRecuperado()) {
       const idPedido = this.pedidoIdRecuperado()!;
@@ -184,7 +178,7 @@ export class PagoComponent implements OnInit {
       const numTarjetaStr = this.numeroTarjeta().replace(/\s/g, '');
       const ultimos4 = numTarjetaStr.slice(-4);
 
-      // SOLUCIÓN ERROR 'pagoData': Definimos el objeto antes de enviarlo
+      // Definimos el objeto antes de enviarlo
       const pagoData: Pago = {
         pedido: { idPedido: idPedido },
         importe: importe,
@@ -202,13 +196,13 @@ export class PagoComponent implements OnInit {
         notaCliente: this.datosEnvio.nota,
       };
 
-      // 1. Guardamos los datos de envío primero
+      // Guardamos los datos de envío primero
       this.pedidoService.actualizarDatosEnvio(idPedido, datosEnvioActualizados).subscribe({
         next: () => {
-          // 2. Si se guardó la dirección, procesamos el pago
+          // Si se guardó la dirección, procesamos el pago
           this.pagoService.procesarPagoSimulado(pagoData).subscribe({
             next: () => {
-              // 3. Finalmente confirmamos el pedido
+              // Finalmente confirmamos el pedido
               this.pedidoService.confirmarPagoPedido(idPedido).subscribe({
                 next: () => {
                   alert('Pago realizado con éxito. Dirección y notas guardadas.');
@@ -233,7 +227,6 @@ export class PagoComponent implements OnInit {
         }
       });
     } else {
-      // ESCENARIO B: Flujo Original (Carrito -> Crear Pedido -> Pago)[cite: 22]
       const totalLimpio = Number(this.totalCarrito().toFixed(2));
 
       const pedidoDTO = {

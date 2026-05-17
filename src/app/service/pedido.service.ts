@@ -20,12 +20,10 @@ export class PedidoService {
     });
   }
 
-  // NUEVO: Obtener un pedido por ID (Dueño o Admin)
   getPedidoById(id: number): Observable<Pedido> {
     return this.http.get<Pedido>(`${this.apiUrl}/${id}`);
   }
 
-  // Obtener lista del usuario actual
   getMisPedidos(): Observable<Pedido[]> {
     return this.http.get<Pedido[]>(`${this.apiUrl}/mis-pedidos`);
   }
@@ -39,12 +37,10 @@ export class PedidoService {
   }
 
   reclamar(id: number, motivo: string) {
-    // Enviamos un objeto JSON con el motivo
     return this.http.put(`${this.apiUrl}/${id}/reclamar`, { motivo: motivo });
   }
 
   confirmarPagoPedido(id: number): Observable<any> {
-    // Este endpoint ahora es accesible para usuarios normales (ROLE_USER)[cite: 32]
     return this.http.post(`${this.apiUrl}/${id}/confirmar-pago`, {});
   }
 
@@ -53,7 +49,6 @@ export class PedidoService {
   }
 
   actualizarDatosEnvio(id: number, datos: any): Observable<any> {
-    // Usamos patch porque solo vamos a actualizar unos pocos campos del pedido
     return this.http.patch(`${this.apiUrl}/${id}/actualizar-envio`, datos);
   }
 }

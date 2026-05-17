@@ -1,17 +1,17 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
-import { AuthService } from '../service/auth.service'; // Ajusta la ruta a tu servicio
+import { AuthService } from '../service/auth.service';
 import { Router } from '@angular/router';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // 1. Obtenemos el token del localStorage
+  // Obtenemos el token del localStorage
   const token = localStorage.getItem('token');
 
-  // 2. Clonamos la petición para añadir el token si existe
+  // Clonamos la petición para añadir el token si existe
   let authReq = req;
   if (token) {
     authReq = req.clone({
@@ -21,7 +21,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     });
   }
 
-  // 3. Enviamos la petición y vigilamos si hay errores
+  // Enviamos la petición y vigilamos si hay errores
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       // Si el error es 401 o 403, el token no es válido o ha caducado

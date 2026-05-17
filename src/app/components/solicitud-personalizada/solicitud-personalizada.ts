@@ -65,7 +65,6 @@ export class PedidoPersonalizadoComponent implements OnInit {
       estado: 'EVALUANDO',
       usuario: { id: user?.id },
       numeroSolicitud: 'SOL-' + Date.now(),
-      // Eliminamos fechaSolicitud de aquí; deja que el @PrePersist de Java la ponga
     };
 
     // Solo incluimos material o tecnología si realmente se han seleccionado

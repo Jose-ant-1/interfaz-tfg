@@ -14,11 +14,10 @@ export class AuthService {
 
   constructor() {
     const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user_data'); // Usamos una clave para todo el objeto
+    const userData = localStorage.getItem('user_data');
 
     if (token && userData) {
       try {
-        // Recuperamos el objeto completo que incluye los ROLES
         this.currentUser.set(JSON.parse(userData));
       } catch (e) {
         this.logout();
@@ -49,7 +48,7 @@ export class AuthService {
 
       if (items.length > 0) {
         items.forEach((item: any) => {
-          // Importante: pasar item.cantidad para no perderla
+          // pasar item.cantidad para no perderla
           carritoService.agregarProducto(item, item.cantidad);
         });
       }
@@ -59,17 +58,17 @@ export class AuthService {
   }
 
   logout() {
-    // 1. Limpiamos las credenciales
+    // Limpiamos las credenciales
     localStorage.removeItem('token');
     localStorage.removeItem('user_data');
 
-    // 2. Limpiamos el carrito local por precaución
+    // Limpiamos el carrito local por precaución
     localStorage.removeItem('carrito_local');
 
-    // 3. Notificamos al sistema que ya no hay usuario
+    // Notificamos al sistema que ya no hay usuario
     this.currentUser.set(null);
 
-    // 4. (Opcional) Limpiar el estado visual del CarritoService
+    // Limpiar el estado visual del CarritoService
     // Obtenemos el servicio a través del injector para evitar dependencias circulares
     const carritoService = this.injector.get(CarritoService);
     carritoService.limpiarEstadoCapaVisual();

@@ -8,8 +8,8 @@ export interface Pago {
   };
   solicitud?: {id: number};
   importe: number;
-  metodoPago: string; // 'TARJETA', 'PAYPAL', etc.
-  estadoPago: string; // 'COMPLETADO', 'PENDIENTE'
+  metodoPago: string;
+  estadoPago: string;
   idTransaccion: string;
   detalles?: string;
   fechaPago?: string;

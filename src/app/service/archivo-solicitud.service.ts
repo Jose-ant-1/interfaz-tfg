@@ -1,4 +1,3 @@
-// archivo-solicitud.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -9,11 +8,6 @@ import { environment } from '../environments/environment';
 export class ArchivoService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/archivos`;
-
-  // Cambia el tipo del parámetro aquí para que no pida una SolicitudPersonalizada
-  guardarReferenciaArchivo(archivo: any): Observable<any> {
-    return this.http.post(this.apiUrl, archivo);
-  }
 
   obtenerArchivos(): Observable<ArchivoSolicitud[]> {
     return this.http.get<ArchivoSolicitud[]>(this.apiUrl);
@@ -33,9 +27,5 @@ export class ArchivoService {
     return this.http.get(url, { responseType: 'blob' });
   }
 
-  descargarArchivoBlob(id: number): Observable<Blob> {
-    return this.http.get(`http://localhost:8080/api/archivos/download/${id}`, {
-      responseType: 'blob',
-    });
-  }
+
 }

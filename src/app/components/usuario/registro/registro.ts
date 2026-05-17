@@ -25,11 +25,10 @@ export class RegistroComponent {
   mensajeError = signal<string | null>(null);
 
   formatPhone(event: any) {
-    let value = event.target.value.replace(/\D/g, ''); // Elimina todo lo que no sea número
+    let value = event.target.value.replace(/\D/g, '');
 
     if (value.length > 9) value = value.substring(0, 9); // Limita a 9 dígitos
 
-    // Aplica el formato: 123 45 67 89
     const part1 = value.substring(0, 3);
     const part2 = value.substring(3, 5);
     const part3 = value.substring(5, 7);

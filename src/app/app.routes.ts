@@ -20,7 +20,7 @@ import { MiPerfilComponent } from './components/usuario/mi-perfil/mi-perfil';
 import { QuienesSomosComponent } from './components/quienes-somos/quienes-somos';
 
 export const routes: Routes = [
-  // --- RUTAS ABIERTAS (Públicas) ---
+  // RUTAS ABIERTAS (Públicas)
   { path: 'login', component: Login },
   { path: 'registro', component: RegistroComponent },
   { path: 'productos', component: Catalogo },
@@ -29,17 +29,15 @@ export const routes: Routes = [
   { path: 'materiales', component: AdminMaterialesComponent },
   { path: 'tecnologias', component: AdminTecnologiasComponent },
 
-  // --- RUTAS DE USUARIO LOGUEADO (Cualquier rol) ---
+  // RUTAS DE USUARIO LOGUEADO (Cualquier rol)
   { path: 'mis-pedidos', component: MisPedidosComponent, canActivate: [authGuard] },
 
-  // --- RUTAS DE ADMINISTRACIÓN (Protegidas) ---
-  // Idealmente aquí usarías un adminGuard en lugar de authGuard
+  // RUTAS DE ADMINISTRACIÓN (Protegidas)
   { path: 'pedidos', component: PedidosListaComponent, canActivate: [authGuard] },
   { path: 'admin/usuarios', component: UsuarioListaComponent, canActivate: [authGuard] },
   { path: 'admin/usuarios/:id/editar', component: EditUsuarioComponent, canActivate: [authGuard] },
   { path: 'admin/usuarios/nuevo', component: EditUsuarioComponent, canActivate: [authGuard] },
 
-  // Pedidos personalizados
   {
     path: 'pedido-personalizado',
     component: PedidoPersonalizadoComponent,
@@ -59,7 +57,7 @@ export const routes: Routes = [
   // Mi perfil
   { path: 'mi-perfil', component: MiPerfilComponent, canActivate: [authGuard] },
 
-  // --- REDIRECCIONES Y FALLBACKS ---
+  // REDIRECCIONES Y FALLBACKS
   { path: '', redirectTo: 'productos', pathMatch: 'full' },
   { path: '**', redirectTo: 'productos' },
 ];

@@ -30,7 +30,6 @@ export class DetalleProductoPredis implements OnInit {
   nuevaValoracion: ValoracionModel = {
     puntuacion: 5,
     comentario: ''
-    // Ahora TS ya no se queja de la falta de fechaValoracion ni de IDs
   };
 
 
@@ -39,7 +38,7 @@ export class DetalleProductoPredis implements OnInit {
 
     const productoNormalizado = {
       id: p.id,
-      nombre: p.nombreProducto, // Mapeo de nombre
+      nombre: p.nombreProducto,
       precio: p.precio,
       imagenUrl: p.imagenUrl,
       cantidad: 1
@@ -55,7 +54,7 @@ export class DetalleProductoPredis implements OnInit {
       this.prodService.obtenerPorId(pId).subscribe({
         next: (p) => {
           this.producto.set(p);
-          this.cargarListaValoraciones(pId); // <--- CARGAR AL INICIAR
+          this.cargarListaValoraciones(pId);
         }
       });
     }
@@ -70,11 +69,11 @@ export class DetalleProductoPredis implements OnInit {
   enviarValoracion(productoId: number) {
     const user = this.authService.currentUser();
 
-    // Usamos el operador && para asegurar que existe el usuario y sus roles
+    // aseguramos que existe el usuario y sus roles
     const isAdmin = user && user.roles && user.roles.includes('ADMIN');
 
     if (!user || isAdmin) {
-      console.warn('⚠️ Acción no permitida');
+      console.warn('Acción no permitida');
       return;
     }
 

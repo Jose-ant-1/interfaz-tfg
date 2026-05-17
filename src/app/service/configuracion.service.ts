@@ -7,7 +7,6 @@ import { environment } from '../environments/environment';
 export class AdminConfigService {
   private http = inject(HttpClient);
 
-  // Rutas basadas en tus Controllers de Java
   private API_MATERIALES = `${environment.apiUrl}/materiales`;
   private API_TECNOLOGIAS = `${environment.apiUrl}/tecnologias`;
 

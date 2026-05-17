@@ -26,9 +26,7 @@ export interface Pedido {
   solicitud?: SolicitudPersonalizada;
   items?: ItemPedido[];
 
-  // Vinculamos con el modelo de Usuario completo para tener acceso a todos sus datos
   usuario?: Usuario;
 
-  // El set de pagos en Java lo mapeamos como un array opcional aquí
   pagos?: any[];
 }

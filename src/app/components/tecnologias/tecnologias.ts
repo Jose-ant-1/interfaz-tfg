@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminConfigService } from '../../service/configuracion.service';
-import { AuthService } from '../../service/auth.service'; // <--- Añadir este import
+import { AuthService } from '../../service/auth.service';
 import { Tecnologia } from '../../models/configuracion.model';
 
 @Component({
@@ -13,7 +13,7 @@ import { Tecnologia } from '../../models/configuracion.model';
 })
 export class AdminTecnologiasComponent implements OnInit {
   private configService = inject(AdminConfigService);
-  public authService = inject(AuthService); // <--- Inyectar para que el HTML lo vea
+  public authService = inject(AuthService);
 
   tecnologias = signal<Tecnologia[]>([]);
   idFilaExpandida = signal<number | null>(null);
@@ -33,11 +33,9 @@ export class AdminTecnologiasComponent implements OnInit {
     this.idFilaExpandida.set(this.idFilaExpandida() === id ? null : id);
   }
 
-  // --- MÉTODOS QUE FALTABAN Y CAUSABAN ERRORES ---
-
   cargarParaEditar(t: Tecnologia) {
     this.editando = true;
-    this.nuevaTecno = { ...t }; // Copiamos el objeto para no editar la lista original por error
+    this.nuevaTecno = { ...t };
   }
 
   cancelarEdicion() {
@@ -45,13 +43,10 @@ export class AdminTecnologiasComponent implements OnInit {
     this.nuevaTecno = this.resetForm();
   }
 
-  // ----------------------------------------------
-
   guardar() {
     if (!this.nuevaTecno.nombre) return;
 
     if (this.editando && this.nuevaTecno.id) {
-      // Usamos el mismo save o update según tu service
       this.configService.saveTecnologia(this.nuevaTecno).subscribe({
         next: () => {
           this.cargarTecnologias();
