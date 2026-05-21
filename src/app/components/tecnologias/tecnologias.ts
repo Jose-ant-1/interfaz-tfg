@@ -63,13 +63,6 @@ export class AdminTecnologiasComponent implements OnInit {
     }
   }
 
-  borrar(id: number | undefined) {
-    if (!id || !confirm('¿Eliminar esta tecnología?')) return;
-    this.configService.deleteTecnologia(id).subscribe(() => {
-      this.tecnologias.update((list) => list.filter((t) => t.id !== id));
-    });
-  }
-
   private resetForm(): Tecnologia {
     return {
       nombre: '',

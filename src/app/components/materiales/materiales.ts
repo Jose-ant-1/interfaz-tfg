@@ -87,12 +87,6 @@ export class AdminMaterialesComponent implements OnInit {
     }
   }
 
-  borrar(id: number | undefined) {
-    if (!id || !confirm('¿Estás seguro de que deseas eliminar este material?')) return;
-    this.configService.deleteMaterial(id).subscribe(() => {
-      this.materiales.update((list) => list.filter((m) => m.id !== id));
-    });
-  }
 
   private resetForm(): Material {
     this.editando = false;
